@@ -15,11 +15,11 @@
                     </v-list-tile-action>
                 </v-list-tile>
                 <v-list-tile avatar tag="div">
-                    <v-list-tile-avatar>
-                        <img src="https://randomuser.me/api/portraits/men/85.jpg">
-                    </v-list-tile-avatar>
+                    <!--<v-list-tile-avatar>
+                        <img src="">
+                    </v-list-tile-avatar>-->
                     <v-list-tile-content>
-                        <v-list-tile-title>John Leider</v-list-tile-title>
+                        <v-list-tile-title>Taiga</v-list-tile-title>
                     </v-list-tile-content>
                     <v-list-tile-action>
                         <v-btn icon @click.stop="mini = !mini">
