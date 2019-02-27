@@ -1,43 +1,37 @@
 <template>
-    <v-flex xs2>
-        <v-navigation-drawer permanent absolute>
-            <v-toolbar flat>
-                <v-list>
-                    <v-list-tile color="success">
-                        <v-list-tile-title class="title">
-                            Github Analysis
-                        </v-list-tile-title>
-                    </v-list-tile>
-                </v-list>
-            </v-toolbar>
-            <v-divider></v-divider>
-            <v-list dense class="pt-0">
-                <v-list-tile v-for="path in paths" :key="path.name" :href="path.route">
-                    <v-list-tile-action>
-                        <v-icon>{{ path.icon }}</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                        {{ path.name }}
-                    </v-list-tile-content>
-                </v-list-tile>
-            </v-list>
-        </v-navigation-drawer>
-    </v-flex>
+    <div>
+            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
+    </div>
 </template>
 
 <script>
+    import Tab from "@/components/Tab";
+    import DataTable from "@/components/DataTable";
+    //import {HEADERS} from "@/constants";
+    //import {USER_STORIES} from "@/constants";
+    import {PROCESSES} from "@/constants";
+    import {GRADIENT} from "@/constants";
+    import CircleChart from "@/components/CircleChart";
+    import SparkLine from "@/components/SparkLine";
+    import BarChart from "@/components/BarChart";
+    import {HEADERS1} from "../constants";
+    import {MEMBERS} from "../constants";
+    import {COMPLEXITY} from "../constants";
+
     export default {
-        name: "GitHub",
-	data() {
+        name: "Github",
+        components: {Tab},
+        data() {
             return {
-                paths: [{name: 'Code Quality', route: '/quality', icon: 'dashboard'},
-                    {name: 'Commits', route: '/comments', icon: 'dashboard'},
-                    {name: 'Code Complexity', route: 'complexity', icon: 'dashboard'}]
+                title: "Github Statistic",
+                tabs: {
+                    'Commits': {data: MEMBERS, component: DataTable, headers: HEADERS1, title: 'Commits in Sprints'},
+                    'Code Complexity': {data: COMPLEXITY, component: CircleChart, title: 'Contributions', headers: null},
+                    //'Pull Requests': {data: GRADIENT, component: SparkLine, title: 'Burn Down Chart', headers: null}
+                    //'Comments': {data: PROCESSES, component: BarChart, title: 'User Stories', headers: null}
+                }
             }
         }
     }
+
 </script>
-
-<style scoped>
-
-</style>
