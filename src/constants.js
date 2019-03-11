@@ -97,3 +97,23 @@ export const GRADIENT = [
     ['#00c6ff', '#F0F', '#FF0'],
     ['#f72047', '#ffd200', '#1feaea']
 ];
+
+export const PIEDATA = [
+    [
+        ['Contribution', 'commits'],
+        ['member 1', 2],
+        ['member 2', 3],
+        ['member 3', 4],
+        ['member 4', 5],
+        ['member 5', 3]
+    ],
+    [
+        ['Contribution', 'commits'],
+        ['member 1', 30],
+        ['member 2', 50],
+        ['member 3', 40],
+        ['member 4', 30],
+        ['member 5', 10]
+    ]
+
+];

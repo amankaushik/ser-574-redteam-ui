@@ -17,6 +17,8 @@
     import {HEADERS1} from "../constants";
     import {MEMBERS} from "../constants";
     import {COMPLEXITY} from "../constants";
+    import PieChart from "@/components/PieChart";
+    import {PIEDATA} from "../constants";
 
     export default {
         name: "Github",
@@ -29,6 +31,8 @@
                     'Code Complexity': {data: COMPLEXITY, component: CircleChart, title: 'Contributions', headers: null},
                     //'Pull Requests': {data: GRADIENT, component: SparkLine, title: 'Burn Down Chart', headers: null}
                     //'Comments': {data: PROCESSES, component: BarChart, title: 'User Stories', headers: null}
+                    'Contribution': {data: PIEDATA, component: PieChart,
+                        title: '["contribution by commits", "contribution by LOC"]'}
                 }
             }
         }
