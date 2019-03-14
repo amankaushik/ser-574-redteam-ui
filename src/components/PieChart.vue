@@ -1,17 +1,12 @@
 <template>
     <v-card height="50%">
         <v-container width="100%">
-            <v-container>
-                <v-layout justify-center>
-                    <GChart
-                            type="PieChart"
-                            :data="data[0]"
-                            :options="{
-                                title:'contribution by commits',
-                                titleTextStyle: {
-                                    fontSize: 16
-                                },
-
+            <h4>{{title}}</h4>
+            <v-layout justify-center>
+                <GChart
+                        type="PieChart"
+                        :data="data"
+                        :options="{
                                 legend: { position: 'left', maxLines:4},
                                 width: 700,
                                 height: 450,
@@ -24,33 +19,8 @@
                                     height:450
                                 }
                              }"
-                    />
-                    <GChart
-                            type="PieChart"
-                            :data="data[1]"
-                            :options="{
-                                title:'contribution by LOC',
-                                titleTextStyle: {
-                                    fontSize: 16
-                                },
-                                legend:'left',
-                                width: 700,
-                                height: 450,
-                                chartArea:{
-                                    left:100,
-                                    top:40,
-                                    right:10,
-                                    bottom:40,
-                                    width:450,
-                                    height:450
-                                }
-                             }"
-                    />
-                </v-layout>
-                <v-container>
-
-                </v-container>
-            </v-container>
+                />
+            </v-layout>
         </v-container>
     </v-card>
 
@@ -63,6 +33,6 @@
         components: {
             GChart
         },
-        props: ["data"]
+        props: ["data", "title"]
     }
 </script>
