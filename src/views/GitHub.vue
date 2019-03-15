@@ -35,7 +35,7 @@
                     //'Pull Requests': {data: GRADIENT, component: SparkLine, title: 'Burn Down Chart', headers: null}
                     //'Comments': {data: PROCESSES, component: BarChart, title: 'User Stories', headers: null}
                     'Contribution': {data: PIEDATA, component: GithubContribution},
-                    'Timeline': {data: TIMELINE, component: GithubTimeline}
+                    'Commits and Pull requests': {data: TIMELINE, component: GithubTimeline}
                 }
             }
         }
