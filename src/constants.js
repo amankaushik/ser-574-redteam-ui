@@ -117,3 +117,19 @@ export const PIEDATA = [
     ]
 
 ];
+
+export const TIMELINE = [
+    [
+        ['Sprint', 'member 1', 'member 2', 'member 3', 'Total'],
+        ['sprint 1',  12,     14,      10,             36],
+        ['sprint 2',  17,     14,      12,             43],
+        ['sprint 3',  14,     17,      25,             56]
+    ],
+    [
+        ['Sprint', 'member 1', 'member 2', 'member 3', 'Total'],
+        ['sprint 1',  5,      6,        8,             19],
+        ['sprint 2',  7,      4,        6,             17],
+        ['sprint 3',  7,      7,        5,             19]
+    ]
+
+];
