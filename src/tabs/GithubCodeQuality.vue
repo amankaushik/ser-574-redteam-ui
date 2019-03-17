@@ -1,7 +1,7 @@
 <template>
     <v-layout row wrap>
         <v-flex xs6>
-            <TableChart :data="data.data1" :headers="data.header1" title="Code Quality by Members"></TableChart>
+            <TableChart :data="data.data1" :headers="data.header1" title="By Members"></TableChart>
             <v-layout justify-center align-center>
                 <v-card blue-grey lighten-4 width="94%">
                     <p class="headline mb-0 text-xs-center" style="background-color: gainsboro">Project Code Quality: 82</p>
@@ -9,7 +9,7 @@
             </v-layout>
         </v-flex>
         <v-flex xs6>
-            <TableChart :data="data.data2" :headers="data.header2" title="Code Quality by Files"></TableChart>
+            <TableChart :data="data.data2" :headers="data.header2" title="By Files"></TableChart>
         </v-flex>
 
     </v-layout>

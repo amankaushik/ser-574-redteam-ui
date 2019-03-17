@@ -2,7 +2,7 @@
     <v-container :width="700">
         <v-card>
             <v-card-title>
-                Nutrition
+                <div class="title font-weight-regular">{{title}}</div>
                 <v-spacer></v-spacer>
                 <v-text-field
                         append-icon="search"
