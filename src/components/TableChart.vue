@@ -1,5 +1,5 @@
 <template>
-    <v-container :width="700">
+    <v-container>
         <v-card>
             <v-card-title>
                 <div class="title font-weight-regular">{{title}}</div>
@@ -20,7 +20,9 @@
             >
                 <template slot="items" slot-scope="props">
                     <td class="text-xs-center">{{ props.item.name }}</td>
-                    <td class="text-xs-left">{{ props.item.codeQuality }}</td>
+                    <td class="text-xs-left"
+                        :style="{ color: props.item.codeQuality>=60?props.item.codeQuality>=80?'green':'orange':'red' }"
+                    >{{ props.item.codeQuality }}</td>
                 </template>
                 <v-alert slot="no-results" :value="true" color="error" icon="warning">
                     Your search for "{{ search }}" found no results.
