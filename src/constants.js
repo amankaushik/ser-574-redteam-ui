@@ -44,36 +44,11 @@ export const HEADERS1 = [
 ];
 
 export const MEMBERS = [
-    {
-        name: 'Abigail',
-        property1: 10,
-        property2: 5,
-        property3: 8
-    },
-    {
-        name: 'James',
-        property1: 10,
-        property2: 6,
-        property3: 8
-    },
-    {
-        name: 'John',
-        property1: 10,
-        property2: 6,
-        property3: 8
-    },
-    {
-        name: 'Anna',
-        property1: 10,
-        property2: 5,
-        property3: 8
-    },
-    {
-        name: 'Lucy',
-        property1: 10,
-        property2: 5,
-        property3: 8
-    }
+    {        name: 'Abigail',        property1: 10,        property2: 5,        property3: 8    },
+    {        name: 'James',        property1: 10,        property2: 6,        property3: 8    },
+    {        name: 'John',        property1: 10,        property2: 6,        property3: 8    },
+    {        name: 'Anna',        property1: 10,        property2: 5,        property3: 8    },
+    {        name: 'Lucy',        property1: 10,        property2: 5,        property3: 8    }
 
 ];
 
@@ -117,3 +92,65 @@ export const PIEDATA = [
     ]
 
 ];
+
+export const TIMELINE = [
+    [
+        ['Sprint', 'member 1', 'member 2', 'member 3', 'Total'],
+        ['sprint 1',  12,     14,      10,             36],
+        ['sprint 2',  17,     14,      12,             43],
+        ['sprint 3',  14,     17,      25,             56]
+    ],
+    [
+        ['Sprint', 'member 1', 'member 2', 'member 3', 'Total'],
+        ['sprint 1',  5,      6,        8,             19],
+        ['sprint 2',  7,      4,        6,             17],
+        ['sprint 3',  7,      7,        5,             19]
+    ]
+
+];
+
+export const CodeQuality = {
+    header1: [
+        {
+            text: 'Member',
+            align: 'center',
+            sortable: false,
+            value: 'name',
+        },
+        {
+            text: 'Code Quality',
+            value: 'codeQuality'
+        }
+    ],
+    data1: [
+        { name: 'Abigail',     codeQuality: 90},
+        { name: 'James',       codeQuality: 70},
+        { name: 'John',        codeQuality: 80},
+        { name: 'Anna',        codeQuality: 60},
+        { name: 'Lucy',        codeQuality: 90}
+    ],
+    header2: [
+        {
+            text: 'File Name',
+            align: 'center',
+            sortable: false,
+            value: 'name'
+        },
+        {
+            text: 'Code Quality',
+            value: 'codeQuality'
+        }
+    ],
+    data2: [
+        { name: 'SyntaxAwareDocument.java',        codeQuality: 90},
+        { name: 'IOAgent.java',        codeQuality: 80},
+        { name: 'PathDB.java',        codeQuality: 70},
+        { name: 'KeywordDB.java',        codeQuality: 60},
+        { name: 'ToJson.java',        codeQuality: 80},
+        { name: 'FindDialog.java',        codeQuality: 70},
+        { name: 'FontFrame.java',        codeQuality: 60},
+        { name: 'IntroFrame.java',        codeQuality: 90},
+        { name: 'TextEditorUI.java',        codeQuality: 70},
+        { name: 'TextLineNumber.java',        codeQuality: 30},
+    ],
+}

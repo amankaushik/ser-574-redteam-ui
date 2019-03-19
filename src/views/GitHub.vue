@@ -14,11 +14,15 @@
     import CircleChart from "@/components/CircleChart";
     //import SparkLine from "@/components/SparkLine";
     //import BarChart from "@/components/BarChart";
-    import GithubContribution from "../tabs/GithubContribution"
+    import GithubContribution from "../tabs/GithubContribution";
+    import GithubTimeline from "../tabs/GithubTimeline";
+    import GithubCodeQuality from "../tabs/GithubCodeQuality";
     import {HEADERS1} from "../constants";
     import {MEMBERS} from "../constants";
     import {COMPLEXITY} from "../constants";
     import {PIEDATA} from "../constants";
+    import {TIMELINE} from "../constants";
+    import {CodeQuality} from "../constants";
 
 
     export default {
@@ -29,10 +33,12 @@
                 title: "Github Statistic",
                 tabs: {
                     'Commits': {data: MEMBERS, component: DataTable, headers: HEADERS1, title: 'Commits in Sprints'},
-                    'Code Complexity': {data: COMPLEXITY, component: CircleChart, title: 'Contributions', headers: null},
+                    'Code Quality': {data:CodeQuality,component: GithubCodeQuality},
                     //'Pull Requests': {data: GRADIENT, component: SparkLine, title: 'Burn Down Chart', headers: null}
                     //'Comments': {data: PROCESSES, component: BarChart, title: 'User Stories', headers: null}
-                    'Contribution': {data: PIEDATA, component: GithubContribution, }
+                    'Contribution': {data: PIEDATA, component: GithubContribution},
+                    'Commits and Pull requests': {data: TIMELINE, component: GithubTimeline},
+
                 }
             }
         }
