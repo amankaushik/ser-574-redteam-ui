@@ -8,12 +8,13 @@
     import Tab from "@/components/Tab";
     import DataTable from "@/components/DataTable";
     import CircleChart from "@/components/CircleChart";
-    import GithubContribution from "../tabs/GithubContribution"
+    import GithubContribution from "../tabs/GithubContribution";
+    import GithubTimeline from "../tabs/GithubTimeline";
     import {HEADERS1} from "../constants";
     import {MEMBERS} from "../constants";
     import {COMPLEXITY} from "../constants";
     import {PIEDATA} from "../constants";
-
+    import {TIMELINE} from "../constants";
 
     export default {
         name: "Github",
@@ -28,7 +29,8 @@
                 tabs: {
                     'Commits': this.fillTabData(MEMBERS, DataTable, HEADERS1, ),
                     'Code Complexity': this.fillTabData(COMPLEXITY, CircleChart , null, 'Contributions'),
-                    'Contribution': this.fillTabData(PIEDATA, GithubContribution, null, null)
+                    'Contribution': this.fillTabData(PIEDATA, GithubContribution, null, null),
+                    'Commits and Pull requests': this.fillTabData(TIMELINE, GithubTimeline, null, null)
                 }
             }
         },
