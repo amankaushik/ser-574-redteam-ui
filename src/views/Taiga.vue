@@ -21,13 +21,70 @@
         data() {
             return {
                 title: "Taiga Statistic",
+                tabsData: {},
                 tabs: {
-                    'Commits': {data: USER_STORIES, component: DataTable, headers: HEADERS, title: 'Commits in Tasks'},
-                    'Contribution': {data: PROCESSES, component: CircleChart, title: 'Contributions', headers: null},
-                    'Burn Down Chart': {data: GRADIENT, component: SparkLine, title: 'Burn Down Chart', headers: null},
-                    'Process': {data: PROCESSES, component: BarChart, title: 'User Stories', headers: null}
+                    'Commits': this.fillTabData(USER_STORIES, DataTable, HEADERS,'Commits in Tasks'),
+                    'Contribution': this.fillTabData(PROCESSES, CircleChart, null, 'Contributions'),
+                    'Burn Down Chart': this.fillTabData(GRADIENT, SparkLine, null, 'Burn Down Chart'),
+                    'Process': this.fillTabData(PROCESSES, BarChart, null, 'User Stories')
                 }
             }
+        },
+        methods: {
+            getCommitsAPI: function () {
+                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_COMMIT_KEY
+            },
+            getBurnDownChartAPI: function () {
+                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_CODE_COMPLEXITY_KEY
+            },
+            getContributionsAPI: function () {
+                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_CONTRIBUTIONS_KEY
+            },
+            getProcessAPI: function () {
+                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_DETAILS_KEY
+            },
+            getDetailsAPI: function () {
+                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_DETAILS_KEY
+            },
+            prepareCommitsDataForRender: function () {
+                return {}
+            },
+            prepareContributionsDataForRender: function () {
+                return {}
+            },
+            prepareProcessDataForRender: function () {
+               return {}
+            },
+            prepareBurnDownChartDataForRender: function () {
+               return {}
+            },
+            prepareDetailsDataForRender: function () {
+               return {}
+            },
+            fillTabData: function (data, component, header, title) {
+                return {data, component, header, title};
+            }
+        },
+        created() {
+            // Initialize resources
+            this.resources['commits'] = this.$resource(this.getCommitsAPI());
+            this.resources['burnDownChart'] = this.$resource(this.getBurnDownChartAPI());
+            this.resources['contributions'] = this.$resource(this.getContributionsAPI());
+            this.resources['details'] = this.$resource(this.getDetailsAPI());
+            this.resources['process'] = this.$resource(this.getProcessAPI());
+        },
+        mounted() {
+            // Get GitHub data
+            this.resources['commits'].save({}).then(response => {this.tabsData['Commits'] = response.body},
+                error => {console.log(error)});
+            this.resources['burnDownChart'].save({}).then(response => {this.tabsData['burnDownChart'] = response.body},
+                error => {console.log(error)});
+            this.resources['contributions'].save({}).then(response => {this.tabsData['Contributions'] = response.body},
+                error => {console.log(error)});
+            this.resources['details'].save({}).then(response => {this.tabsData['Details'] = response.body},
+                error => {console.log(error)});
+            this.resources['process'].save({}).then(response => {this.tabsData['Process'] = response.body},
+                error => {console.log(error)});
         }
     }
 
