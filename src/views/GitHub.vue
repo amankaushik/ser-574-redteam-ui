@@ -1,6 +1,21 @@
 <template>
     <div>
-        <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
+        <template v-if="isLoading">
+            <div class="text-xs-center">
+                <v-progress-circular
+                        :rotate="360"
+                        :size="100"
+                        :width="15"
+                        :value="donePercent"
+                        color="teal"
+                >
+                    {{ donePercent }}
+                </v-progress-circular>
+            </div>
+        </template>
+        <template v-else>
+            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
+        </template>
     </div>
 </template>
 
@@ -9,77 +24,117 @@
     import DataTable from "@/components/DataTable";
     import CircleChart from "@/components/CircleChart";
     import GithubContribution from "../tabs/GithubContribution";
-    import GithubTimeline from "../tabs/GithubTimeline";
     import {HEADERS1} from "../constants";
-    import {MEMBERS} from "../constants";
-    import {COMPLEXITY} from "../constants";
-    import {PIEDATA} from "../constants";
-    import {TIMELINE} from "../constants";
 
     export default {
         name: "Github",
         components: {Tab},
         data() {
             return {
+                isLoading: true,
+                interval: {},
+                donePercent: 0,
                 title: "Github Statistic",
                 resources: {},
-                tabsKeys: {Commits: 'commits', 'Code Complexity': 'codeComplexity', Details: 'details',
-                    Contributions: 'contributions'},
-                tabsData: {},
-                tabs: {
-                    'Commits': this.fillTabData(MEMBERS, DataTable, HEADERS1, ),
-                    'Code Complexity': this.fillTabData(COMPLEXITY, CircleChart , null, 'Contributions'),
-                    'Contribution': this.fillTabData(PIEDATA, GithubContribution, null, null),
-                    'Commits and Pull requests': this.fillTabData(TIMELINE, GithubTimeline, null, null)
-                }
+                slug: this.$route.params.slug,
+                tabKeys: {
+                    Commits: 'commits', 'Code Quality - Files': 'codeQualityFiles', Details: 'details',
+                    'Code Quality - Authors': 'codeQualityAuthors'
+                },
+                tabs: {}
             }
         },
         methods: {
             getCommitsAPI: function () {
-                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_COMMIT_KEY
+                return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMMIT_VIEW
+                    + this.slug;
             },
-            getCodeComplexityAPI: function () {
-                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_CODE_COMPLEXITY_KEY
-            },
-            getContributionsAPI: function () {
-                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_CONTRIBUTIONS_KEY
+            getAllFilesComplexityAPI: function () {
+                return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_FILES
+                    + this.slug;
             },
             getDetailsAPI: function () {
-                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_DETAILS_KEY
+                return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_LIST_REPO_VIEW
+                    + this.slug;
             },
-            prepareCommitsDataForRender: function () {
-                return {}
+            getAllAuthorsComplexityAPI: function () {
+                return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_AUTHORS
+                    + this.slug;
             },
-            prepareContributionsDataForRender: function () {
-                return {}
+            prepareCommitsDataForRender: function (data) {
+                return data;
             },
-            prepareDetailsDataForRender: function () {
-               return {}
+            prepareFilesComplexityDataForRender: function (data) {
+                return data;
             },
-            prepareCodeComplexityDataForRender: function () {
-               return {}
+            prepareDetailsDataForRender: function (data) {
+                return data;
+            },
+            prepareAuthorsComplexityDataForRender: function (data) {
+                return data;
             },
             fillTabData: function (data, component, header, title) {
                 return {data, component, header, title};
+            },
+            addToPorgress: function () {
+                return 100.0 / Object.keys(this.tabKeys).length;
             }
         },
         created() {
-            // Initialize resources
-            this.resources['commits'] = this.$resource(this.getCommitsAPI());
-            this.resources['codeComplexity'] = this.$resource(this.getCodeComplexityAPI());
-            this.resources['contributions'] = this.$resource(this.getContributionsAPI());
-            this.resources['details'] = this.$resource(this.getDetailsAPI());
         },
         mounted() {
+
+            // Initialize resources
+            this.resources[this.tabKeys['Commits']] = this.$resource(this.getCommitsAPI());
+            this.resources[this.tabKeys['Code Quality - Files']] = this.$resource(this.getAllFilesComplexityAPI());
+            this.resources[this.tabKeys['Code Quality - Authors']] = this.$resource(this.getAllAuthorsComplexityAPI());
+            this.resources[this.tabKeys['Details']] = this.$resource(this.getDetailsAPI());
+            // Progress Bar
+            this.interval = setInterval(() => {
+                console.log("Running");
+                if (this.donePercent >= 100.0) {
+                    console.log("Done");
+                    this.isLoading = false;
+                    return (this.donePercent = 0.0)
+                }
+            }, 1000);
+
             // Get GitHub data
-            this.resources['commits'].save({}).then(response => {this.tabsData['Commits'] = response.body},
-                error => {console.log(error)});
-            this.resources['codeComplexity'].save({}).then(response => {this.tabsData['CodeComplexity'] = response.body},
-                error => {console.log(error)});
-            this.resources['contributions'].save({}).then(response => {this.tabsData['Contributions'] = response.body},
-                error => {console.log(error)});
-            this.resources['details'].save({}).then(response => {this.tabsData['Details'] = response.body},
-                error => {console.log(error)});
+            this.resources[this.tabKeys['Commits']].save({}).then(response => {
+                this.tabs[this.tabKeys['Commits']] = this.fillTabData(
+                    this.prepareCommitsDataForRender(response.body), DataTable, HEADERS1, null);
+            }).catch((error) => {
+                console.log(error)
+            }).finally(() => {
+                this.donePercent += this.addToPorgress();
+            });
+            this.resources[this.tabKeys['Code Quality - Files']].save({}).then(response => {
+                this.tabs[this.tabKeys['Code Quality - Files']] = this.fillTabData(
+                    this.prepareFilesComplexityDataForRender(response.body), CircleChart, null, null);
+            }).catch((error) => {
+                console.log(error)
+            }).finally(() => {
+                this.donePercent += this.addToPorgress();
+            });
+            this.resources[this.tabKeys['Code Quality - Authors']].save({}).then(response => {
+                this.tabs[this.tabKeys['Code Quality - Authors']] = this.fillTabData(
+                    this.prepareAuthorsComplexityDataForRender(response.body), GithubContribution, null, null);
+            }).catch((error) => {
+                console.log(error)
+            }).finally(() => {
+                this.donePercent += this.addToPorgress();
+            });
+            this.resources[this.tabKeys['Details']].save({}).then(response => {
+                this.tabs[this.tabKeys['Details']] = this.fillTabData(
+                    this.prepareDetailsDataForRender(response.body), DataTable, HEADERS1, null);
+            }).catch((error) => {
+                console.log(error)
+            }).finally(() => {
+                this.donePercent += this.addToPorgress();
+            });
+        },
+        beforeDestroy: function () {
+            clearInterval(this.interval);
         }
     }
 
