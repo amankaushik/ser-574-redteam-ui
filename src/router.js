@@ -17,12 +17,12 @@ export default new Router({
             component: Landing
         },
         {
-            path: '/taiga',
+            path: '/taiga/:slug',
             name: 'taiga',
             component: Taiga
         },
         {
-            path: '/github',
+            path: '/github/:slug',
             name: 'github',
             component: GitHub
         },

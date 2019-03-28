@@ -12,12 +12,12 @@
             </v-toolbar>
             <v-divider></v-divider>
             <v-list dense class="pt-0">
-                <v-list-tile v-for="path in paths" :key="path.name" :href="path.route">
+                <v-list-tile v-for="card in cards" :key="card.name">
                     <v-list-tile-action>
-                        <v-icon>{{ path.icon }}</v-icon>
+                        <v-icon>{{ card.icon }}</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                        {{ path.name }}
+                        <SingleInputModal :title=title :custom-object=card></SingleInputModal>
                     </v-list-tile-content>
                 </v-list-tile>
             </v-list>
@@ -26,15 +26,15 @@
 </template>
 
 <script>
+    import SingleInputModal from "@/components/SingleInputModal";
+
     export default {
         name: "NavDrawerPermanent",
+        components: {SingleInputModal},
+        props: {title: String, cards: Array},
         data() {
             return {
-                paths: [{name: 'GitHub', route: '/github', icon: 'dashboard'}, {
-                    name: 'Taiga',
-                    route: '/taiga',
-                    icon: 'dashboard'
-                }]
+                repoName: ''
             }
         }
     }

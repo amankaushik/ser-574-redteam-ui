@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-layout>
-            <NavDrawerPermanent></NavDrawerPermanent>
+            <NavDrawerPermanent :title=title :cards=cards></NavDrawerPermanent>
             <v-layout>
                 <v-flex xs12 sm6 offset-sm3>
                     <v-card>
@@ -12,11 +12,9 @@
                                         :key="index"
                                         xl
                                 >
-                                        <v-card hover flat color="grey lighten-4">
-                                            <router-link :to="card.route">
-                                                <v-img height="125px" width="300px" contain :src="card.img" :alt="card.name"></v-img>
-                                            </router-link>
-                                        </v-card>
+                                    <v-card hover flat color="grey lighten-4">
+                                        <SingleInputModal :title=title :custom-object=card :has-image=true></SingleInputModal>
+                                    </v-card>
                                 </v-flex>
                             </v-layout>
                         </v-container>
@@ -29,26 +27,35 @@
 
 <script>
     import NavDrawerPermanent from "@/components/NavDrawerPermanent";
+    import SingleInputModal from "@/components/SingleInputModal";
 
     export default {
         name: "Dashboard",
-        components: {NavDrawerPermanent},
+        components: {SingleInputModal, NavDrawerPermanent},
         data() {
             return {
                 hover: true,
                 gridSize: 'xl',
+                repoName: '',
+                title: 'Enter Search Slug',
                 cards: [
                     {
                         name: 'GitHub',
-                        route: '/github',
+                        slug: ' Repository Name',
+                        route: 'github',
                         button: 'Explore',
-                        img: '/assets/github.png'
+                        img: '/assets/github.png',
+                        dialog: false,
+                        icon: "dashboard"
                     },
                     {
                         name: 'Taiga',
-                        route: '/taiga',
+                        slug: ' Board Name',
+                        route: 'taiga',
                         button: 'Explore',
-                        img: '/assets/taiga.png'
+                        img: '/assets/taiga.png',
+                        dialog: false,
+                        icon: "dashboard"
                     }
                 ]
             }
