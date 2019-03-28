@@ -13,7 +13,8 @@
         <v-tabs-items v-model="tabModel">
             <v-tab-item v-for="(details, key) in tabTitles" :key="key">
                 <component v-bind:is="details.component" v-bind:data="details.data"
-                           v-bind:headers="details.headers"></component>
+                           v-bind:headers="details.headers" v-bind:leadColumn="details.leadColumn"
+                           v-bind:title="details.title"></component>
             </v-tab-item>
         </v-tabs-items>
     </div>
@@ -28,5 +29,9 @@
                 tabModel: null
             }
         },
+        mounted() {
+            /*console.log("TABS");
+            console.log(this.tabTitles);*/
+        }
     }
 </script>

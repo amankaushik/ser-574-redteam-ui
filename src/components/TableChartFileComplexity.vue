@@ -15,14 +15,20 @@
             <v-data-table
                     :headers="headers"
                     :items="data"
+                    :expand="expand"
                     :search="search"
+                    item-key="itemKey"
                     class="elevation-1"
             >
-                <template slot="items" slot-scope="props">
-                    <td class="text-xs-center">{{ props.item.name }}</td>
-                    <td class="text-xs-left"
-                        :style="{ color: props.item.codeQuality>=60?props.item.codeQuality>=80?'green':'orange':'red' }"
-                    >{{ props.item.codeQuality }}</td>
+                <template v-slot:items="props">
+                    <td class="text-xs-center">{{ props.item.fileName }}</td>
+                    <td class="text-xs-center">{{ props.item.booleanExpressionComplexity }}</td>
+                    <td class="text-xs-center">{{ props.item.classFanOutComplexity }}</td>
+                    <td class="text-xs-center">{{ props.item.cyclomaticComplexity }}</td>
+                    <td class="text-xs-center">{{ props.item.javaNCSS }}</td>
+                    <td class="text-xs-center">{{ props.item.nPathComplexity }}</td>
+                    <td class="text-xs-center">{{ props.item.classDataAbstractionCoupling }}</td>
+                    <td class="text-xs-center">{{ props.item.javaWarnings }}</td>
                 </template>
                 <v-alert slot="no-results" :value="true" color="error" icon="warning">
                     Your search for "{{ search }}" found no results.
@@ -37,9 +43,10 @@
 <script>
     export default {
         name: "TableChart",
-        props: ["data", "headers", "title"],
+        props: ["data", "headers", "title", "itemKey", "leadColumn"],
         data() {
             return {
+                expand: false,
                 search: ''
             }
         },
@@ -50,6 +57,7 @@
     table.v-table thead {
         font-size: 24px;
     }
+
     table.v-table tbody tr td {
         font-size: 14px;
     }
