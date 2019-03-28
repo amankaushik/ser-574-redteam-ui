@@ -31,7 +31,7 @@
     export default {
         name: "NavDrawerPermanent",
         components: {SingleInputModal},
-        props: {title: String, cards: Object},
+        props: {title: String, cards: Array},
         data() {
             return {
                 repoName: ''
