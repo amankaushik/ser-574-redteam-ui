@@ -1,18 +1,18 @@
 <template>
     <div>
-        <template v-if="isLoading">
-            <div class="text-xs-center">
-                <v-progress-circular
-                        :rotate="360"
-                        :size="400"
-                        :width="150"
-                        :value="donePercent"
-                        color="teal"
-                >
-                    {{ donePercent }}
-                </v-progress-circular>
-            </div>
-        </template>
+        <v-container v-if="isLoading">
+            <v-layout align-center justify-center>
+                        <v-progress-circular
+                                :rotate="360"
+                                :size="400"
+                                :width="150"
+                                :value="donePercent"
+                                color="teal"
+                        >
+                            {{ donePercent }}
+                        </v-progress-circular>
+            </v-layout>
+        </v-container>
         <template v-else>
             <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
         </template>
@@ -158,7 +158,7 @@
             }, 1000);
 
             // Get GitHub data
-            this.resources[this.tabKeys['commits']].save({}).then(response => {
+            this.resources[this.tabKeys['commits']].get({}).then(response => {
                 this.tabs[this.tabKeys['commits']] = this.fillTabData(
                     this.prepareCommitsDataForRender(response.body), DataTable, HEADERS1, null);
             }).catch((error) => {
@@ -168,7 +168,7 @@
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
-            this.resources[this.tabKeys['codeQualityByFiles']].save({}).then(response => {
+            this.resources[this.tabKeys['codeQualityByFiles']].get({}).then(response => {
                 const COMPLEXITY_KEY = "metric";
                 let auxData = this.prepareFilesComplexityDataForRender(response.body);
                 let tableData = [];
@@ -202,7 +202,7 @@
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
-            this.resources[this.tabKeys['codeQualityByAuthors']].save({}).then(response => {
+            this.resources[this.tabKeys['codeQualityByAuthors']].get({}).then(response => {
                 const COMPLEXITY_KEY = "metric";
                 let auxData = this.prepareAuthorsComplexityDataForRender(response.body);
                 let tableData = [];
@@ -236,7 +236,7 @@
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
-            this.resources[this.tabKeys['details']].save({}).then(response => {
+            this.resources[this.tabKeys['details']].get({}).then(response => {
                 this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(response.body), GitHubDetails,
                     [{text: 'Member Name', value: 'name'}], "Repository Details", null);

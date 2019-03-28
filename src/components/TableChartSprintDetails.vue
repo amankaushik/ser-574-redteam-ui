@@ -15,38 +15,31 @@
             <v-data-table
                     :headers="headers"
                     :items="data"
-                    :expand="expand"
                     :search="search"
-                    item-key="itemKey"
                     class="elevation-1"
             >
                 <template v-slot:items="props">
-                    <td class="text-xs-center">{{ props.item.fileName }}</td>
-                    <td class="text-xs-center">{{ props.item.booleanExpressionComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.classFanOutComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.cyclomaticComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.javaNCSS }}</td>
-                    <td class="text-xs-center">{{ props.item.nPathComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.classDataAbstractionCoupling }}</td>
-                    <td class="text-xs-center">{{ props.item.javaWarnings }}</td>
+                    <td>{{ props.item["sprint_name"] }}</td>
+                    <td class="text-xs-left">{{ props.item["status"] }}</td>
+                    <td class="text-xs-left">{{ props.item["created_date"] }}</td>
+                    <td class="text-xs-left">{{ props.item["estimated_start"] }}</td>
+                    <td class="text-xs-left">{{ props.item["estimated_finish"] }}</td>
+                    <td class="text-xs-left">{{ props.item["gap"] }}</td>
                 </template>
                 <v-alert slot="no-results" :value="true" color="error" icon="warning">
                     Your search for "{{ search }}" found no results.
                 </v-alert>
             </v-data-table>
         </v-card>
-
     </v-container>
-
 </template>
 
 <script>
     export default {
-        name: "TableChartFileComplexity",
-        props: ["data", "headers", "title", "itemKey", "leadColumn"],
+        name: "TableChartSprintDetails",
+        props: ["data", "headers", "title", "leadColumn"],
         data() {
             return {
-                expand: false,
                 search: ''
             }
         },

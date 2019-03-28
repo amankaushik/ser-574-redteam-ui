@@ -11,15 +11,10 @@
                         hide-details
                         v-model="search"
                 ></v-text-field>
-                <!--<v-spacer></v-spacer>
-                <v-btn color="primary" dark @click="expand = !expand">
-                    {{ expand ? 'Close' : 'Keep' }} other rows
-                </v-btn>-->
             </v-card-title>
             <v-data-table
                     :headers="headers"
                     :items="data"
-                    :expand="expand"
                     :search="search"
                     item-key="itemKey"
                     class="elevation-1"
@@ -46,7 +41,7 @@
 
 <script>
     export default {
-        name: "TableChart",
+        name: "TableChartAuthorComplexity",
         props: ["data", "headers", "title", "itemKey", "leadColumn"],
         data() {
             return {
@@ -54,13 +49,6 @@
                 search: ''
             }
         },
-        mounted() {
-            console.log(this.data);
-            console.log(this.headers);
-            /*
-            console.log(this.itemKey);
-            console.log(this.leadColumn);*/
-        }
     }
 </script>
 
