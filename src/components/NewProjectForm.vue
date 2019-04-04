@@ -26,67 +26,23 @@
                         type=""
                         v-model="projectData.projectName"
                         :counter="50"
-                        :rules="rules.nameRules"
                         label="Project Name"
                         required
                 ></v-text-field>
 
                 <br>
                 <v-text-field
-                        v-model="projectData.taigaProjectName"
+                        v-model="projectData.taigaSlug"
                         :counter="50"
-                        :rules="rules.nameRules"
-                        label="Taiga Project Name"
+                        label="Taiga Slug"
                         required
                 ></v-text-field>
                 <v-text-field
-                        v-model="projectData.taigaUsername"
+                        v-model="projectData.githubSlug"
                         :counter="50"
-                        :rules="rules.nameRules"
-                        label="Taiga Username"
+                        label="Github Slug"
                         required
                 ></v-text-field>
-                <v-text-field
-                        v-model="projectData.taigaPassword"
-                        :counter="50"
-                        label="Taiga Password"
-                        required
-                ></v-text-field>
-                <v-btn
-                        :disabled="!valid"
-                        color="success"
-                        @click="validate"
-                >
-                    Check Taiga
-                </v-btn>
-                <v-text-field
-                        v-model="projectData.githubProjectName"
-                        :counter="50"
-                        :rules="rules.nameRules"
-                        label="Github Project Name"
-                        required
-                ></v-text-field>
-                <v-text-field
-                        v-model="projectData.githubUsername"
-                        :counter="50"
-                        :rules="rules.nameRules"
-                        label="Github Username"
-                        required
-                ></v-text-field>
-                <v-text-field
-                        v-model="projectData.githubPassword"
-                        :counter="50"
-                        label="Github Password"
-                        color="green"
-                        required
-                ></v-text-field>
-                <v-btn
-                        :disabled="!valid"
-                        color="success"
-                        @click="validate"
-                >
-                    Check Github
-                </v-btn>
                 <v-textarea
                         v-model="projectData.description"
                         :counter="500"
@@ -104,11 +60,11 @@
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn
-                        :disabled="!form"
                         :loading="isLoading"
                         class="white--text"
                         color="deep-purple accent-4"
                         depressed
+                        v-on:click="$emit('createProject', projectData)"
                 >Submit</v-btn>
             </v-card-actions>
         </v-card>
@@ -124,12 +80,8 @@
                 valid: true,
                 projectData:{
                     projectName: "",
-                    taigaProjectName:"",
-                    taigaUsername:"",
-                    taigaPassword:"",
-                    githubProjectName:"",
-                    githubUsername:"",
-                    githubPassword:"",
+                    taigaSlug:"",
+                    githubSlug:"",
                     description:""
                 },
                 rules:{
