@@ -14,64 +14,25 @@
                     </v-toolbar>
                     <v-divider></v-divider>
                     <v-list dense class="pt-0">
-                        <v-list-tile v-for="(course, index) in courses" :key="course.name">
-                            <v-btn dark block :color="activeCourse===index?'green darken-3':'green'"
-                                   @click="showCourse(index)">
-                                <v-icon dark pr-3>{{ 'dashboard' }}</v-icon>{{ (index+1) + '. ' +course.name }}
-                            </v-btn>
-                        </v-list-tile>
-                        <hr>
-                        <v-list-tile>
-                            <v-btn dark block color="lime" @click="showNewCourse=!showNewCourse">
-                                <v-icon dark>add</v-icon> add course
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile v-if="this.showNewCourse">
-                            <v-text-field
-                                    v-model="newCourseName"
-                            ></v-text-field>
-                            <v-btn @click="addCourse()">
-                                add
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile>
-                            <v-btn dark block color="lime" @click="showRemoveCourse=!showRemoveCourse">
-                                <v-icon dark>remove</v-icon> remove course
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile v-if="this.showRemoveCourse">
-                            <v-text-field
-                                    v-model="removeCourseIndex"
-                            ></v-text-field>
-                            <v-btn @click="removeCourse()">
-                                remove
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile>
-                            <v-btn dark block color="lime" @click="showNewProject=!showNewProject">
-                                <v-icon dark>add</v-icon> add project
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile>
-                            <v-btn dark block color="lime" @click="showRemoveProject=!showRemoveProject">
-                                <v-icon dark>remove</v-icon> remove project
-                            </v-btn>
-                        </v-list-tile>
-                        <v-list-tile v-if="this.showRemoveProject">
-                            <v-text-field
-                                    v-model="removeProjectIndex"
-                            ></v-text-field>
-                            <v-btn @click="removeProject()">
-                                remove
-                            </v-btn>
-                        </v-list-tile>
+                        <course-list
+                                :courses="this.courses"
+                                :active-course="this.activeCourse"
+                                @showCourse="showCourse"
+                        ></course-list>
+                        <control-panel
+                                @addCourse="addCourse"
+                                @removeCourse="removeCourse"
+                                @showNewProjectForm="showNewProject=!showNewProject"
+                                @removeProject="removeProject"
+                        ></control-panel>
                     </v-list>
                 </v-navigation-drawer>
             </v-flex>
             <v-flex xs12 sm12 offset-sm1>
                 <new-project-form
                         v-on:createProject="createProject"
-                        v-if="this.showNewProject"></new-project-form>
+                        v-if="this.showNewProject">
+                </new-project-form>
                 <v-layout row wrap>
                     <v-flex
                             v-for="(project, index) in this.courses[this.activeCourse].projects"
@@ -88,13 +49,16 @@
 </template>
 
 <script>
+    import CourseList from "../components/CourseList";
+    import ControlPanel from "../components/ControlPanel";
     import NewProjectForm from "../components/NewProjectForm";
     import ProjectSummary from "../components/ProjectSummary";
+
     import {COURSES} from "../constants";
 
     export default {
         name: "DashboardExtent",
-        components: {ProjectSummary, NewProjectForm},
+        components: {CourseList, ProjectSummary, NewProjectForm, ControlPanel},
         data() {
             return {
                 courses:[],
@@ -102,13 +66,7 @@
                     name: 'project 1', route: '/github', icon: 'dashboard'
                 },
                 activeCourse:0,
-                showNewCourse:false,
                 showNewProject:false,
-                newCourseName: 'course name',
-                showRemoveCourse:false,
-                showRemoveProject:false,
-                removeCourseIndex: 'course index',
-                removeProjectIndex: 'project index',
                 hover: true,
                 gridSize: 'xl'
             }
@@ -133,26 +91,20 @@
             showCourse: function (index) {
                 this.activeCourse = index;
             },
-            addCourse: function () {
+            addCourse: function (project) {
+                console.log("add course");
                 this.courses.push({
-                    name: this.newCourseName,
+                    name: project.name,
                     projects:[]
                 });
                 this.showNewCourse=false;
             },
-            removeCourse: function () {
-                if(!isNaN(this.removeCourseIndex)){
-                    this.courses.splice(this.removeCourseIndex-1, 1);
-                    this.showRemoveCourse=false;
-                }
+            removeCourse: function (index) {
+                console.log("remove index "+ index);
+                this.courses.splice(index-1, 1);
+                this.showRemoveCourse=false;
             },
             createProject:function(project){
-                console.log({
-                    name: project.projectName,
-                    githubSlug: project.githubSlug,
-                    taigaSlug: project.taigaSlug,
-                    description: project.description
-                });
                 this.courses[this.activeCourse].projects.push({
                     name: project.projectName,
                     githubSlug: project.githubSlug,
@@ -162,15 +114,14 @@
                 this.showNewProject=false;
             },
             removeProject: function (index) {
-                console.log("remove project "+this.removeProjectIndex);
-                if(!isNaN(this.removeProjectIndex)){
-                    this.courses[this.activeCourse].projects.splice(index-1, 1);
-                    this.showRemoveProject=false;
-                }
+                console.log("remove project" + index);
+                this.courses[this.activeCourse].projects.splice(index-1, 1);
+                this.showRemoveProject=false;
             }
         },
         created() {
             if (localStorage.getItem('courses')) this.courses = JSON.parse(localStorage.getItem('courses'));
+            else this.courses = COURSES;
         }
     }
 </script>
