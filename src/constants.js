@@ -153,4 +153,41 @@ export const CodeQuality = {
         { name: 'TextEditorUI.java',        codeQuality: 70},
         { name: 'TextLineNumber.java',        codeQuality: 30},
     ],
-}
+};
+
+export const COURSES = [
+    {
+        name: 'ser 001',
+        projects:[
+            {
+                name: 'project 1',
+                githubSlug: '',
+                taigaSlug:'',
+                description: 'here is the description about project 1'
+            },
+            {
+                name: 'project 2',
+                githubSlug: '',
+                taigaSlug:'',
+                description: 'here is the description about project 2'
+            }
+        ]
+    },
+    {
+        name: 'ser 002',
+        projects:[
+            {
+                name: 'project 3',
+                githubSlug: '',
+                taigaSlug:'',
+                description: 'here is the description about project 1'
+            },
+            {
+                name: 'project 4',
+                githubSlug: '',
+                taigaSlug:'',
+                description: 'here is the description about project 2'
+            }
+        ]
+    },
+];
