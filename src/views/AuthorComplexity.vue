@@ -23,9 +23,6 @@
                 leadColumn: this.$route.params.payload.leadColumn
             }
         },
-        mounted() {
-            console.log(this.$route.params)
-        }
     }
 </script>
 

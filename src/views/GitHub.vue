@@ -26,6 +26,7 @@
     import GithubCodeQualityByFile from "@/tabs/GithubCodeQualityByFile";
     import GithubCodeQualityByAuthor from "@/tabs/GithubCodeQualityByAuthor";
     import GitHubDetails from "@/tabs/GitHubDetails";
+    import GitHubCommitDetails from "@/tabs/GitHubCommitDetails";
 
     export default {
         name: "Github",
@@ -42,7 +43,7 @@
                 slug: this.$route.params.slug,
                 /* this is used to calculate the progress bar */
                 tabKeys: {
-                    commits: 'Commits', codeQualityByFiles: 'Code Quality By Files', details: 'Details',
+                    commits: 'Commits', codeQualityByFiles: 'Code Quality By Files', details: 'Repo Details',
                     codeQualityByAuthors: 'Code Quality By Authors'
                 },
                 tabs: {}
@@ -218,7 +219,8 @@
 
                 console.log(tableData);
                 this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData({
-                        tableData:tableData, baselines: auxData['baselines']}
+                        tableData: tableData, baselines: auxData['baselines']
+                    }
                     , GithubCodeQualityByFile, headers, "By Files", leadValue);
             }).catch((errorCQ) => {
                 this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData(
@@ -254,7 +256,8 @@
                 });
                 console.log(tableData);
                 this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData({
-                        tableData:tableData, baselines: auxData['baselines']}
+                        tableData: tableData, baselines: auxData['baselines']
+                    }
                     , GithubCodeQualityByAuthor, headers, "By Authors", leadValue);
             }).catch((errorCQA) => {
                 this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData(
@@ -275,6 +278,10 @@
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
+            /* This tab will be filled at runtime */
+            this.tabs['Commit Details'] = this.fillTabData({hasData: false}, GitHubCommitDetails, [], "Commit Details",
+                this.slug)
+
             /* Mix the data */
             /*this.addCommitDataToDetails(this.tabs[this.tabKeys['details']]);
             this.addPRDataToDetails();*/
