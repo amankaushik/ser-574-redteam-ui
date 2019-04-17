@@ -20,29 +20,29 @@
             <v-timeline-item
                     v-for="(item, i) in dataBundleByDateBadgeDisplay"
                     :key="i"
-                    :color="getRandomColor()"
+                    :color="item.color"
                     dark
                     small
                     fill-dot
             >
                 <v-card
-                        :color="currentColor"
+                        :color="item.color"
                         dark
                 >
-                    <v-card-title class="title">{{i}}</v-card-title>
+                    <v-card-title class="title">{{item.data.date}}</v-card-title>
                     <v-card-text class="white text--primary">
                         <v-container>
                             <v-layout>
-                                <v-flex xs8>
-                                    <v-chip :color="currentColor" v-for="(node, i) in item" :key="i" text-color="white">
-                                        <v-avatar class="darken-4" :color="currentColor">{{node.value}}</v-avatar>
+                                <v-flex xs12>
+                                    <v-chip :color="item.color" v-for="(node, i) in item.data.data" :key="i" text-color="white">
+                                        <v-avatar class="darken-4" :color="item.color">{{node.value}}</v-avatar>
                                         {{node.text}}
                                     </v-chip>
                                 </v-flex>
                             </v-layout>
                         </v-container>
                         <v-btn
-                                :color="currentColor"
+                                :color="item.color"
                                 class="mx-0"
                                 outline
                                 :to="{name:'authorCommitDetails', params: {payload: {dataBundleByAuthor}}, props: true}">
@@ -69,16 +69,15 @@
                 details: {},
                 dataBundleByDate: {},
                 dataBundleByAuthor: {},
-                dataBundleByDateBadgeDisplay: {},
+                dataBundleByDateBadgeDisplay: [],
                 currentColor: ''
             }
         },
         methods: {
             getRandomColor() {
                 let colors = ["red lighten-3", "indigo lighten-3", "purple lighten-3", "teal lighten-3",
-                    "green lighten-3", "orange lighten-3", "brown lighten-3", "blue-grey lighten-3", "deep-orange lighten-3"];
-                this.currentColor = colors[Math.floor(Math.random() * colors.length)];
-                return this.currentColor;
+                    "green lighten-3", "brown lighten-3", "blue-grey lighten-3", "deep-orange lighten-3"];
+                return colors[Math.floor(Math.random() * colors.length)];
             },
             getHashesAPI: function () {
                 return process.env.VUE_APP_GITHUB_LIST_COMMIT_HASHES + this.slug;
@@ -98,6 +97,16 @@
                     }
                 }, 1000);
                 let details = {};
+                details["1234"] = {
+                    'hash': '1234',
+                    'repositoryID': 168214867,
+                    'author': 'sarthak-tiwari',
+                    'message': 'Added gitignore for python to the source directory',
+                    'date': 20190202, 'timeCommitted': '2019-02-07T23:39:00Z',
+                    'files': '[".gitignore"]',
+                    'additions': 116,
+                    'deletions': 0
+                };
                 this.hashCodes.forEach(function (node, _index) {
                     //let ep = this.getHashDetailsAPI(node);
                     //this.$resource(ep).get({}).then(response => {
@@ -134,7 +143,6 @@
             makeDataBundle: function () {
                 let dataBundleByDate = {};
                 let dataBundleByAuthor = {};
-                console.log(this.details);
                 for (let hashCode in this.details) {
                     if (this.details.hasOwnProperty(hashCode)) {
                         if (dataBundleByDate.hasOwnProperty(hashCode)) {
@@ -151,10 +159,10 @@
                                 dataBundleByDate[this.formatDate(this.details[hashCode].date)]['authors'].length;
                         } else {
                             dataBundleByDate[this.formatDate(this.details[hashCode].date)] = {
-                                'additions': {value: this.details[hashCode]['additions'], text: 'Additions'},
-                                'deletions': {value: this.details[hashCode]['deletions'], text: 'Deletions'},
-                                'files': {value: this.details[hashCode]['files'].length, text: 'Files'},
-                                'commits': {value: 1, text: 'Commits'},
+                                'additions': {value: this.details[hashCode]['additions'], text: 'Addition(s)'},
+                                'deletions': {value: this.details[hashCode]['deletions'], text: 'Deletion(s)'},
+                                'files': {value: this.details[hashCode]['files'].length, text: 'File(s)'},
+                                'commits': {value: 1, text: 'Commit(s)'},
                                 'authors': {value: new Set(this.details[hashCode]['author']), text: 'Authors'},
                                 'authorCount': {value: 1, text: 'Author(s)'}
                             }
@@ -162,9 +170,10 @@
                     }
                 }
 
+                console.log(this.details);
                 for (let hashCode in this.details) {
                     if (this.details.hasOwnProperty(hashCode)) {
-                        if (dataBundleByAuthor.hasOwnProperty(hashCode)) {
+                        if (dataBundleByAuthor.hasOwnProperty(this.details[hashCode].author)) {
                             dataBundleByAuthor[this.details[hashCode].author].push([{
                                 value: this.details[hashCode].files,
                                 text: 'Files Modified'
@@ -188,9 +197,12 @@
                 for (let node in dataBundleByDateBadgeDisplay) {
                     if (dataBundleByDateBadgeDisplay.hasOwnProperty(node)) {
                         delete dataBundleByDateBadgeDisplay[node]['authors'];
+                        this.dataBundleByDateBadgeDisplay.push({
+                            data: {date: node, data: dataBundleByDateBadgeDisplay[node]},
+                            color: this.getRandomColor()
+                        });
                     }
                 }
-                this.dataBundleByDateBadgeDisplay = dataBundleByDateBadgeDisplay;
                 console.log(this.dataBundleByDateBadgeDisplay);
                 this.dataBundleByAuthor = dataBundleByAuthor;
             }
