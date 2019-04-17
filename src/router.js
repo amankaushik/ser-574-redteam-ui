@@ -5,6 +5,7 @@ import Taiga from "@/views/Taiga";
 import GitHub from "@/views/GitHub";
 import Dashboard from "@/views/Dashboard";
 import DashboardExtent from "@/views/DashboardExtent";
+import AuthorComplexity from "@/views/AuthorComplexity";
 
 Vue.use(Router);
 
@@ -36,6 +37,11 @@ export default new Router({
             path: '/dashboardExtent',
             name: 'dashboardExtent',
             component: DashboardExtent
+        },
+        {
+            path: '/complexity/:author/:payload?',
+            name: 'authorComplexity',
+            component: AuthorComplexity
         }
     ]
 })

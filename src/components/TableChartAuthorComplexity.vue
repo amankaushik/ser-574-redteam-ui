@@ -32,7 +32,18 @@
                     </v-tooltip>
                 </template>
                 <template v-slot:items="props">
-                    <td>{{ props.item.author }}</td>
+                    <td>
+                        <router-link v-if="showAuthor"
+                                     :to="{name:'authorComplexity', props: true, params: {author: props.item.author,
+                                 payload: {data:[props.item], baselines, headers, title:'Code Complexity: '+props.item.author, leadColumn}}}">
+                            {{
+                            props.item.author }}
+                        </router-link>
+                        <template v-else>
+                            {{
+                            props.item.author }}
+                        </template>
+                    </td>
                     <td class="text-xs-center"
                         :style="getColor('booleanExpressionComplexity', props.item.booleanExpressionComplexity)">
                         {{ props.item.booleanExpressionComplexity }}
@@ -73,11 +84,11 @@
 </template>
 
 <script>
-    import {getBaseline , getColor} from "../utils";
+    import {getBaseline, getColor} from "../utils";
 
     export default {
         name: "TableChartAuthorComplexity",
-        props: ["data", "headers", "title", "itemKey", "leadColumn", "baselines"],
+        props: ["data", "headers", "title", "itemKey", "leadColumn", "baselines", "showAuthor"],
         data() {
             return {
                 expand: false,

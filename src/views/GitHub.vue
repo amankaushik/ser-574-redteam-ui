@@ -266,7 +266,7 @@
             this.resources[this.tabKeys['details']].get({}).then(response => {
                 this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(response.body), GitHubDetails,
-                    [{text: 'Member Name', value: 'name'}], "Repository Details", null);
+                    ['Member Name', 'Repository Link', 'Total Commits', 'Total PRs'], "Repository Details", null);
             }).catch((errorDetails) => {
                 this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(null), GitHubDetails,
