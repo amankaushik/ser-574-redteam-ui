@@ -1,7 +1,7 @@
 <template>
     <v-layout row wrap>
         <v-flex>
-            <TableChartAuthorComplexity :data="data" :headers="headers" :title="title" :itemKey="leadColumn" :leadColumn="leadColumn">
+            <TableChartAuthorComplexity :data="tableData" :baselines="baselines" :headers="headers" :title="title" :itemKey="leadColumn" :leadColumn="leadColumn">
             </TableChartAuthorComplexity>
             <v-layout justify-center align-center>
                 <v-card blue-grey lighten-4 width="94%">
@@ -18,7 +18,15 @@
     export default {
         name: "GithubCodeQualityByAuthor",
         components: {TableChartAuthorComplexity},
-        props: {data: Array, headers: Array, title:String, leadColumn: String},
+        props: {data: Object, headers: Array, title:String, leadColumn: String},
+        computed: {
+            tableData: function () {
+                return this.data.tableData;
+            },
+            baselines: function () {
+                return this.data.baselines;
+            }
+        },
     }
 </script>
 

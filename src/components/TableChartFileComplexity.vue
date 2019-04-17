@@ -20,15 +20,48 @@
                     item-key="itemKey"
                     class="elevation-1"
             >
+                <template slot="headerCell" slot-scope="props">
+                    <v-tooltip left>
+                        <template v-slot:activator="{ on }">
+                          <span v-on="on">
+                            {{ props.header.text }}
+                          </span>
+                        </template>
+                        <span>
+                              Baseline Value: {{ getBaseline(props.header.value) }}
+                            </span>
+                    </v-tooltip>
+                </template>
                 <template v-slot:items="props">
                     <td class="text-xs-center">{{ props.item.fileName }}</td>
-                    <td class="text-xs-center">{{ props.item.booleanExpressionComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.classFanOutComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.cyclomaticComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.javaNCSS }}</td>
-                    <td class="text-xs-center">{{ props.item.nPathComplexity }}</td>
-                    <td class="text-xs-center">{{ props.item.classDataAbstractionCoupling }}</td>
-                    <td class="text-xs-center">{{ props.item.javaWarnings }}</td>
+                    <td class="text-xs-center"
+                        :style="getColor('booleanExpressionComplexity', props.item.booleanExpressionComplexity)">
+                        {{ props.item.booleanExpressionComplexity }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('classFanOutComplexity', props.item.classFanOutComplexity)">
+                        {{ props.item.classFanOutComplexity }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('cyclomaticComplexity', props.item.cyclomaticComplexity)">{{
+                        props.item.cyclomaticComplexity }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('javaNCSS', props.item.javaNCSS)">{{
+                        props.item.javaNCSS }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('nPathComplexity', props.item.nPathComplexity)">{{
+                        props.item.nPathComplexity }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('classDataAbstractionCoupling', props.item.classDataAbstractionCoupling)">{{
+                        props.item.classDataAbstractionCoupling }}
+                    </td>
+                    <td class="text-xs-center"
+                        :style="getColor('javaWarnings', props.item.javaWarnings)">{{
+                        props.item.javaWarnings }}
+                    </td>
                 </template>
                 <v-alert slot="no-results" :value="true" color="error" icon="warning">
                     Your search for "{{ search }}" found no results.
@@ -41,15 +74,25 @@
 </template>
 
 <script>
+    import {getBaseline , getColor} from "../utils";
+
     export default {
         name: "TableChartFileComplexity",
-        props: ["data", "headers", "title", "itemKey", "leadColumn"],
+        props: ["data", "headers", "title", "itemKey", "leadColumn", "baselines"],
         data() {
             return {
                 expand: false,
-                search: ''
+                search: '',
             }
         },
+        methods: {
+            getBaseline(key) {
+                return getBaseline(key, this.baselines);
+            },
+            getColor(key, value) {
+                return getColor(key, value, this.baselines);
+            }
+        }
     }
 </script>
 

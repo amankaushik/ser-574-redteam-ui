@@ -2,19 +2,19 @@
     <div>
         <v-container v-if="isLoading">
             <v-layout align-center justify-center>
-                        <v-progress-circular
-                                :rotate="360"
-                                :size="400"
-                                :width="150"
-                                :value="donePercent"
-                                color="teal"
-                        >
-                            {{ donePercent }}
-                        </v-progress-circular>
+                <v-progress-circular
+                        :rotate="360"
+                        :size="400"
+                        :width="150"
+                        :value="donePercent"
+                        color="teal"
+                >
+                    {{ donePercent }}
+                </v-progress-circular>
             </v-layout>
         </v-container>
         <template v-else>
-            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
+            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title" v-bind:repoURL="repoURL"></Tab>
         </template>
     </div>
 </template>
@@ -37,8 +37,10 @@
                 donePercent: 0,
                 titlePrefix: "Github Statistics",
                 title: null,
+                repoURL: null,
                 resources: {},
                 slug: this.$route.params.slug,
+                /* this is used to calculate the progress bar */
                 tabKeys: {
                     commits: 'Commits', codeQualityByFiles: 'Code Quality By Files', details: 'Details',
                     codeQualityByAuthors: 'Code Quality By Authors'
@@ -73,13 +75,20 @@
                 }
             },
             prepareFilesComplexityDataForRender: function (data) {
-                const LEAD = "fileName";
-                const SKIP_KEY = "repositoryName";
                 let renderDataObj = {};
                 renderDataObj['data'] = [];
+                renderDataObj['baselines'] = {};
                 if (data === null) {
-                    return [];
+                    return renderDataObj;
                 } else {
+                    const BASELINES = "baselines";
+                    const EXTRACT_KEY = "complexities";
+                    renderDataObj[BASELINES] = data[BASELINES];
+                    data = data[EXTRACT_KEY];
+                    const LEAD = "fileName";
+                    const SKIP_KEY = "repositoryName";
+
+                    console.log(data);
                     data.forEach(function (node, nodeIndex) {
                         delete node[SKIP_KEY];
                         let renderData = {};
@@ -94,25 +103,33 @@
                         renderDataObj['data'].push(renderData);
                     });
                 }
+                console.log(renderDataObj);
                 return renderDataObj;
             },
             prepareDetailsDataForRender: function (data) {
                 const EXTRACT_KEY = "collaborators";
+                const REPO_URL_KEY = "repoURL";
                 if (data === null) {
                     return [];
                 } else {
+                    this.repoURL = data[REPO_URL_KEY];
                     data = data[EXTRACT_KEY];
                     return data;
                 }
             },
             prepareAuthorsComplexityDataForRender: function (data) {
-                const LEAD = "author";
-                const SKIP_KEY = "repositoryName";
                 let renderDataObj = {};
                 renderDataObj['data'] = [];
+                renderDataObj['baselines'] = {};
                 if (data === null) {
                     return renderDataObj;
                 } else {
+                    const LEAD = "author";
+                    const EXTRACT_KEY = "complexities";
+                    const SKIP_KEY = "repositoryName";
+                    const BASELINES = "baselines";
+                    renderDataObj[BASELINES] = data[BASELINES];
+                    data = data[EXTRACT_KEY];
                     data.forEach(function (node, nodeIndex) {
                         delete node[SKIP_KEY];
                         let renderData = {};
@@ -127,6 +144,7 @@
                         renderDataObj['data'].push(renderData);
                     });
                 }
+                console.log(renderDataObj);
                 return renderDataObj;
             },
             fillTabData: function (data, component, headers, title, leadColumn) {
@@ -135,6 +153,10 @@
             addToProgress: function () {
                 return 100.0 / Object.keys(this.tabKeys).length;
             },
+            addCommitDataToDetails: function (data) {
+            },
+            addPRDataToDetails: function () {
+            }
         }
         ,
         created() {
@@ -161,10 +183,10 @@
             this.resources[this.tabKeys['commits']].get({}).then(response => {
                 this.tabs[this.tabKeys['commits']] = this.fillTabData(
                     this.prepareCommitsDataForRender(response.body), DataTable, HEADERS1, null);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorCommits) => {
+                this.tabs[this.tabKeys['commits']] = this.fillTabData(
                     this.prepareCommitsDataForRender(null), DataTable, HEADERS1, null);
-                console.log(error);
+                console.log(errorCommits);
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
@@ -193,12 +215,15 @@
                         value: key
                     });
                 });
-                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData(tableData
+
+                console.log(tableData);
+                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData({
+                        tableData:tableData, baselines: auxData['baselines']}
                     , GithubCodeQualityByFile, headers, "By Files", leadValue);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorCQ) => {
+                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData(
                     this.prepareFilesComplexityDataForRender(null), GithubCodeQualityByFile, null, null);
-                console.log(error)
+                console.log(errorCQ)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
@@ -227,12 +252,14 @@
                         value: key
                     });
                 });
-                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData(tableData
+                console.log(tableData);
+                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData({
+                        tableData:tableData, baselines: auxData['baselines']}
                     , GithubCodeQualityByAuthor, headers, "By Authors", leadValue);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorCQA) => {
+                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData(
                     this.prepareAuthorsComplexityDataForRender(null), GithubCodeQualityByAuthor, null, null);
-                console.log(error)
+                console.log(errorCQA)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
@@ -240,14 +267,17 @@
                 this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(response.body), GitHubDetails,
                     [{text: 'Member Name', value: 'name'}], "Repository Details", null);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorDetails) => {
+                this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(null), GitHubDetails,
                     [{text: 'Member Name', value: 'name'}], "Repository Details", null);
-                console.log(error)
+                console.log(errorDetails)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
+            /* Mix the data */
+            /*this.addCommitDataToDetails(this.tabs[this.tabKeys['details']]);
+            this.addPRDataToDetails();*/
         },
         beforeDestroy: function () {
             clearInterval(this.interval);
