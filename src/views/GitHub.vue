@@ -21,13 +21,12 @@
 
 <script>
     import Tab from "@/components/Tab";
-    import DataTable from "@/components/DataTable";
-    import {HEADERS1} from "../constants";
     import GithubCodeQualityByFile from "@/tabs/GithubCodeQualityByFile";
     import GithubCodeQualityByAuthor from "@/tabs/GithubCodeQualityByAuthor";
     import GitHubDetails from "@/tabs/GitHubDetails";
     import GitHubCommitDetails from "@/tabs/GitHubCommitDetails";
     import GitHubCommitsToTaigaUS from "@/tabs/GitHubCommitsToTaigaUS";
+    import GithubContribution from "@/tabs/GithubContribution";
 
     export default {
         name: "Github",
@@ -41,29 +40,37 @@
                 title: null,
                 repoURL: null,
                 resources: {},
+                nameToTotalCommits: {},
+                gitIdToName: {},
+                nameToCommitDistribution: {},
                 slug: this.$route.params.slug,
                 /* this is used to calculate the progress bar */
-                tabKeys: {
-                    commits: 'Commits', codeQualityByFiles: 'Code Quality By Files', details: 'Repo Details',
-                    codeQualityByAuthors: 'Code Quality By Authors'
-                },
+                tabKeys:
+                    {
+                        commits: 'Commits', codeQualityByFiles:
+                            'Code Quality By Files', details:
+                            'Repo Details',
+                        codeQualityByAuthors:
+                            'Code Quality By Authors',
+                        usCommits: 'US Commits',
+                        commitDetails: 'Commit Details'
+                    }
+                ,
                 tabs: {}
             }
         },
         methods: {
             getCommitsAPI: function () {
-                let hack = this.slug.split('/');
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMMIT_VIEW
-                    + hack[1];
+                    + this.slug;
             },
             getAllFilesComplexityAPI: function () {
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_FILES
                     + this.slug;
             },
             getDetailsAPI: function () {
-                let hack = this.slug.split('/');
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_LIST_REPO_VIEW
-                    + hack[1];
+                    + this.slug;
             },
             getAllAuthorsComplexityAPI: function () {
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_AUTHORS
@@ -73,7 +80,30 @@
                 if (data === null) {
                     return [];
                 } else {
-                    return data;
+                    console.log(data);
+                    let collaborators = data["collaborators"];
+                    let commits = data["commits"];
+                    let gitIdToName = {};
+                    let nameToTotalCommits = {};
+                    let nameToCommitDistribution = {};
+                    collaborators.forEach(function (node) {
+                        gitIdToName[node.githubId] = node.name;
+                    });
+                    commits.forEach(function (node) {
+                        nameToTotalCommits[gitIdToName[node.githubId]] = node.numberOfCommits;
+                        nameToCommitDistribution[gitIdToName[node.githubId]] = node.distribution;
+                    });
+                    let pieChartData = [];
+                    pieChartData.push(['Contributors', 'Commits']);
+                    for (let name in nameToTotalCommits) {
+                        if (nameToTotalCommits.hasOwnProperty(name)) {
+                            pieChartData.push([name, nameToTotalCommits[name]]);
+                        }
+                    }
+                    this.nameToTotalCommits = nameToTotalCommits;
+                    this.gitIdToName = gitIdToName;
+                    this.nameToCommitDistribution = nameToCommitDistribution;
+                    return pieChartData;
                 }
             },
             prepareFilesComplexityDataForRender: function (data) {
@@ -90,7 +120,6 @@
                     const LEAD = "fileName";
                     const SKIP_KEY = "repositoryName";
 
-                    console.log(data);
                     data.forEach(function (node, nodeIndex) {
                         delete node[SKIP_KEY];
                         let renderData = {};
@@ -105,7 +134,6 @@
                         renderDataObj['data'].push(renderData);
                     });
                 }
-                console.log(renderDataObj);
                 return renderDataObj;
             },
             prepareDetailsDataForRender: function (data) {
@@ -118,6 +146,9 @@
                     data = data[EXTRACT_KEY];
                     return data;
                 }
+            },
+            preparePlaceholderData: function () {
+                return {hasData: false};
             },
             prepareAuthorsComplexityDataForRender: function (data) {
                 let renderDataObj = {};
@@ -146,24 +177,23 @@
                         renderDataObj['data'].push(renderData);
                     });
                 }
-                console.log(renderDataObj);
                 return renderDataObj;
             },
             fillTabData: function (data, component, headers, title, leadColumn) {
                 return {data, component, headers, title, leadColumn};
             },
             addToProgress: function () {
-                return 100.0 / Object.keys(this.tabKeys).length;
+                return 100.0 / (Object.keys(this.tabKeys).length - 2);
             },
-            addCommitDataToDetails: function (data) {
+            addCommitDataToDetails: function () {
+                let aux = this.nameToTotalCommits;
+                this.tabs[this.tabKeys['details']].data.forEach(function (node) {
+                    node['totalCommits'] = aux[node.name];
+                });
             },
             addPRDataToDetails: function () {
             }
-        }
-        ,
-        created() {
-        }
-        ,
+        },
         mounted() {
             // Form Page Title
             this.title = `${this.titlePrefix} - ${this.slug}`;
@@ -177,6 +207,7 @@
             this.interval = setInterval(() => {
                 if (this.donePercent >= 100.0) {
                     this.isLoading = false;
+                    this.addCommitDataToDetails();
                     return (this.donePercent = 0.0)
                 }
             }, 1000);
@@ -184,10 +215,10 @@
             // Get GitHub data
             this.resources[this.tabKeys['commits']].get({}).then(response => {
                 this.tabs[this.tabKeys['commits']] = this.fillTabData(
-                    this.prepareCommitsDataForRender(response.body), DataTable, HEADERS1, null);
+                    this.prepareCommitsDataForRender(response.body), GithubContribution, ['Contribution', 'commits'], null);
             }).catch((errorCommits) => {
                 this.tabs[this.tabKeys['commits']] = this.fillTabData(
-                    this.prepareCommitsDataForRender(null), DataTable, HEADERS1, null);
+                    this.prepareCommitsDataForRender(null), GithubContribution, ['Contribution', 'commits'], null);
                 console.log(errorCommits);
             }).finally(() => {
                 this.donePercent += this.addToProgress();
@@ -218,7 +249,6 @@
                     });
                 });
 
-                console.log(tableData);
                 this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData({
                         tableData: tableData, baselines: auxData['baselines']
                     }
@@ -255,7 +285,6 @@
                         value: key
                     });
                 });
-                console.log(tableData);
                 this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData({
                         tableData: tableData, baselines: auxData['baselines']
                     }
@@ -280,14 +309,13 @@
                 this.donePercent += this.addToProgress();
             });
             /* These tabs will be filled at runtime */
-            this.tabs['Commit Details'] = this.fillTabData({hasData: false}, GitHubCommitDetails, [], "Commit Details",
+            this.tabs[this.tabKeys['commitDetails']] = this.fillTabData(this.preparePlaceholderData(), GitHubCommitDetails, [], "Commit Details",
                 this.slug);
-            this.tabs['US Commits'] = this.fillTabData({hasData: false}, GitHubCommitsToTaigaUS, [], "US Commits",
-                this.slug)
+            this.tabs[this.tabKeys['usCommits']] = this.fillTabData(this.preparePlaceholderData(), GitHubCommitsToTaigaUS, [], "US Commits",
+                this.slug);
 
             /* Mix the data */
-            /*this.addCommitDataToDetails(this.tabs[this.tabKeys['details']]);
-            this.addPRDataToDetails();*/
+            /*this.addPRDataToDetails();*/
         },
         beforeDestroy: function () {
             clearInterval(this.interval);
