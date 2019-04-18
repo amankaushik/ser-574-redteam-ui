@@ -2,6 +2,16 @@
     <v-container>
         <v-layout justify-center column>
             <v-card>
+                <v-container v-if="isLoading">
+                    <v-layout align-center justify-center>
+                        <v-progress-circular
+                                :size="70"
+                                :width="7"
+                                color="purple"
+                                indeterminate
+                        ></v-progress-circular>
+                    </v-layout>
+                </v-container>
                 <template v-if="!data.hasData">
                     <v-container>
                         <v-layout justify-space-around>
@@ -33,36 +43,47 @@
                         </v-layout>
                     </v-container>
                 </template>
-                <v-layout v-else row>
+                <v-layout v-if="data.hasData && !isLoading" row>
                     <v-flex xs12 sm6 offset-sm3>
                         <v-card>
                             <v-toolbar flat>
-                                <v-btn icon>
-                                    <v-icon>arrow_back</v-icon>
-                                </v-btn>
-                                <v-toolbar-title>Albums</v-toolbar-title>
+                                <v-toolbar-title>US - GitHub Commits</v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
                                     <v-icon>search</v-icon>
                                 </v-btn>
                             </v-toolbar>
-                            <v-subheader>May</v-subheader>
-                            <v-container fluid grid-list-sm>
-                                <v-layout row wrap>
-                                    <v-flex v-for="i in 6" :key="i" xs4>
-                                        <img :src="`https://randomuser.me/api/portraits/men/${i + 20}.jpg`" class="image" alt="lorem" width="100%" height="100%">
-                                    </v-flex>
-                                </v-layout>
-                            </v-container>
-                            <v-subheader>June</v-subheader>
-                            <v-container fluid grid-list-sm>
-                                <v-layout row wrap>
-                                    <v-flex v-for="i in 6" :key="i" xs4>
-                                        <img :src="`https://randomuser.me/api/portraits/women/${i + 5}.jpg`" class="image" alt="lorem" width="100%" height="100%">
-                                    </v-flex>
-                                </v-layout>
-                            </v-container>
-                            <v-footer class="mt-5"></v-footer>
+                            <template v-for="(item, i) in usCommits">
+                                <v-container :key="i" fluid grid-list-sm>
+                                    <v-subheader>{{item.subject}}</v-subheader>
+                                    <v-layout row wrap>
+                                        <v-flex xs4>
+                                            <v-card elevation="4">
+                                                <v-card-title>US Number</v-card-title>
+                                                <v-card-text>{{item.number}}</v-card-text>
+                                            </v-card>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-card elevation="4">
+                                                <v-card-title>Start Date</v-card-title>
+                                                <v-card-text>{{formatDate(item.start_date)}}</v-card-text>
+                                            </v-card>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-card elevation="4">
+                                                <v-card-title>End Date</v-card-title>
+                                                <v-card-text>{{formatDate(item.end_date)}}</v-card-text>
+                                            </v-card>
+                                        </v-flex>
+                                        <v-flex xs4>
+                                            <v-card elevation="4">
+                                                <v-card-title>Commit Count</v-card-title>
+                                                <v-card-text>{{item.commit_count}}</v-card-text>
+                                            </v-card>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </template>
                         </v-card>
                     </v-flex>
                 </v-layout>
@@ -78,7 +99,6 @@
         data() {
             return {
                 isLoading: false,
-                donePercent: 0.0,
                 taigaSlug: null,
                 resources: {},
                 usCommits: []
@@ -86,22 +106,36 @@
         },
         methods: {
             getUSCommitDetails: function () {
-                console.log(this.data);
-                console.log(this.headers);
-                console.log(this.title);
-                console.log(this.leadColumn);
+                this.data.hasData = true;
+                this.isLoading = true;
                 let ep = process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMMITS_ON_TAIGA_US +
                     this.taigaSlug + "&repoName=" + this.leadColumn;
-                this.$resource(ep).get({}).then(response => {
-                    this.usCommits = response.body;
-                    this.data.hasData = true;
-                    console.log(this.usCommits);
-                }).catch((errorHashes) => {
-                    this.usCommits = [];
-                    console.log(errorHashes);
-                });
+                let promises = [];
+                promises.push(new Promise((resolve, reject) => {
+                    this.$resource(ep).get({})
+                        .then(response => resolve(response))
+                        .catch(() => reject)
+                }));
+                let usCommits = null;
+                let isLoading = null;
+                Promise.all(promises).then(function (response) {
+                    usCommits = response[0].data;
+                    isLoading = false;
+                }).finally(() => {
+                        this.isLoading = isLoading;
+                        this.usCommits = usCommits;
+                    }
+                );
+            },
+            formatDate: function (date) {
+                if (date == null)
+                    return "N/A";
+                date = date.toString();
+                // JS date months start from 0
+                let formattedDate = new Date(date.slice(0, 4), parseInt(date.slice(4, 6)) - 1, date.slice(6, 8));
+                return formattedDate.toDateString();
             }
-        }
+        },
     }
 </script>
 
