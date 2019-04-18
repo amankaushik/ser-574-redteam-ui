@@ -1,24 +1,26 @@
 <template>
     <v-layout row wrap>
         <v-flex>
-            <TableChartSprintDetails :data="data" :headers="headers" :title="title" :leadColumn="leadColumn">
+            <TableChartSprintStats :data="data" :headers="headers" :title="title" :leadColumn="leadColumn"
+                                     v-if="leadColumn === 'name'">
+            </TableChartSprintStats>
+            <TableChartSprintDetails v-else :data="data" :headers="headers" :title="title" :leadColumn="leadColumn"
+                                     >
             </TableChartSprintDetails>
-            <v-layout justify-center align-center>
-                <v-card blue-grey lighten-4 width="94%">
-                    <!--<p class="headline mb-0 text-xs-center" style="background-color: gainsboro">Project Code Quality: 82</p>-->
-                </v-card>
-            </v-layout>
         </v-flex>
     </v-layout>
 </template>
 
 <script>
-    import  TableChartSprintDetails from "../components/TableChartSprintDetails"
+    import TableChartSprintDetails from "../components/TableChartSprintDetails"
+    import TableChartSprintStats from "../components/TableChartSprintStats"
+
     export default {
         name: "TaigaSprintDetails",
-        components: {TableChartSprintDetails},
-        props: {data: Array, headers: Array, title:String, leadColumn: String},
+        components: {TableChartSprintDetails, TableChartSprintStats},
+        props: ["data", "headers", "title", "leadColumn"],
     }
+
 </script>
 
 <style scoped>
