@@ -2,30 +2,31 @@
     <div>
         <v-container v-if="isLoading">
             <v-layout align-center justify-center>
-                        <v-progress-circular
-                                :rotate="360"
-                                :size="400"
-                                :width="150"
-                                :value="donePercent"
-                                color="teal"
-                        >
-                            {{ donePercent }}
-                        </v-progress-circular>
+                <v-progress-circular
+                        :rotate="360"
+                        :size="400"
+                        :width="150"
+                        :value="donePercent"
+                        color="teal"
+                >
+                    {{ donePercent }}
+                </v-progress-circular>
             </v-layout>
         </v-container>
         <template v-else>
-            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title"></Tab>
+            <Tab v-bind:tabTitles=tabs v-bind:toolbarTitle="title" v-bind:repoURL="repoURL"></Tab>
         </template>
     </div>
 </template>
 
 <script>
     import Tab from "@/components/Tab";
-    import DataTable from "@/components/DataTable";
-    import {HEADERS1} from "../constants";
     import GithubCodeQualityByFile from "@/tabs/GithubCodeQualityByFile";
     import GithubCodeQualityByAuthor from "@/tabs/GithubCodeQualityByAuthor";
     import GitHubDetails from "@/tabs/GitHubDetails";
+    import GitHubCommitDetails from "@/tabs/GitHubCommitDetails";
+    import GitHubCommitsToTaigaUS from "@/tabs/GitHubCommitsToTaigaUS";
+    import GithubContribution from "@/tabs/GithubContribution";
 
     export default {
         name: "Github",
@@ -37,29 +38,39 @@
                 donePercent: 0,
                 titlePrefix: "Github Statistics",
                 title: null,
+                repoURL: null,
                 resources: {},
+                nameToTotalCommits: {},
+                gitIdToName: {},
+                nameToCommitDistribution: {},
                 slug: this.$route.params.slug,
-                tabKeys: {
-                    commits: 'Commits', codeQualityByFiles: 'Code Quality By Files', details: 'Details',
-                    codeQualityByAuthors: 'Code Quality By Authors'
-                },
+                /* this is used to calculate the progress bar */
+                tabKeys:
+                    {
+                        commits: 'Commits', codeQualityByFiles:
+                            'Code Quality By Files', details:
+                            'Repo Details',
+                        codeQualityByAuthors:
+                            'Code Quality By Authors',
+                        usCommits: 'US Commits',
+                        commitDetails: 'Commit Details'
+                    }
+                ,
                 tabs: {}
             }
         },
         methods: {
             getCommitsAPI: function () {
-                let hack = this.slug.split('/');
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMMIT_VIEW
-                    + hack[1];
+                    + this.slug;
             },
             getAllFilesComplexityAPI: function () {
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_FILES
                     + this.slug;
             },
             getDetailsAPI: function () {
-                let hack = this.slug.split('/');
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_LIST_REPO_VIEW
-                    + hack[1];
+                    + this.slug;
             },
             getAllAuthorsComplexityAPI: function () {
                 return process.env.VUE_APP_GITHUB_BASE + process.env.VUE_APP_GITHUB_COMPLEXITY_ALL_AUTHORS
@@ -69,17 +80,45 @@
                 if (data === null) {
                     return [];
                 } else {
-                    return data;
+                    let collaborators = data["collaborators"];
+                    let commits = data["commits"];
+                    let gitIdToName = {};
+                    let nameToTotalCommits = {};
+                    let nameToCommitDistribution = {};
+                    collaborators.forEach(function (node) {
+                        gitIdToName[node.githubId] = node.name;
+                    });
+                    commits.forEach(function (node) {
+                        nameToTotalCommits[gitIdToName[node.githubId]] = node.numberOfCommits;
+                        nameToCommitDistribution[gitIdToName[node.githubId]] = node.distribution;
+                    });
+                    let pieChartData = [];
+                    pieChartData.push(['Contributors', 'Commits']);
+                    for (let name in nameToTotalCommits) {
+                        if (nameToTotalCommits.hasOwnProperty(name)) {
+                            pieChartData.push([name, nameToTotalCommits[name]]);
+                        }
+                    }
+                    this.nameToTotalCommits = nameToTotalCommits;
+                    this.gitIdToName = gitIdToName;
+                    this.nameToCommitDistribution = nameToCommitDistribution;
+                    return pieChartData;
                 }
             },
             prepareFilesComplexityDataForRender: function (data) {
-                const LEAD = "fileName";
-                const SKIP_KEY = "repositoryName";
                 let renderDataObj = {};
                 renderDataObj['data'] = [];
+                renderDataObj['baselines'] = {};
                 if (data === null) {
-                    return [];
+                    return renderDataObj;
                 } else {
+                    const BASELINES = "baselines";
+                    const EXTRACT_KEY = "complexities";
+                    renderDataObj[BASELINES] = data[BASELINES];
+                    data = data[EXTRACT_KEY];
+                    const LEAD = "fileName";
+                    const SKIP_KEY = "repositoryName";
+
                     data.forEach(function (node, nodeIndex) {
                         delete node[SKIP_KEY];
                         let renderData = {};
@@ -98,21 +137,31 @@
             },
             prepareDetailsDataForRender: function (data) {
                 const EXTRACT_KEY = "collaborators";
+                const REPO_URL_KEY = "repoURL";
                 if (data === null) {
                     return [];
                 } else {
+                    this.repoURL = data[REPO_URL_KEY];
                     data = data[EXTRACT_KEY];
                     return data;
                 }
             },
+            preparePlaceholderData: function () {
+                return {hasData: false};
+            },
             prepareAuthorsComplexityDataForRender: function (data) {
-                const LEAD = "author";
-                const SKIP_KEY = "repositoryName";
                 let renderDataObj = {};
                 renderDataObj['data'] = [];
+                renderDataObj['baselines'] = {};
                 if (data === null) {
                     return renderDataObj;
                 } else {
+                    const LEAD = "author";
+                    const EXTRACT_KEY = "complexities";
+                    const SKIP_KEY = "repositoryName";
+                    const BASELINES = "baselines";
+                    renderDataObj[BASELINES] = data[BASELINES];
+                    data = data[EXTRACT_KEY];
                     data.forEach(function (node, nodeIndex) {
                         delete node[SKIP_KEY];
                         let renderData = {};
@@ -133,13 +182,17 @@
                 return {data, component, headers, title, leadColumn};
             },
             addToProgress: function () {
-                return 100.0 / Object.keys(this.tabKeys).length;
+                return 100.0 / (Object.keys(this.tabKeys).length - 2);
             },
-        }
-        ,
-        created() {
-        }
-        ,
+            addCommitDataToDetails: function () {
+                let aux = this.nameToTotalCommits;
+                this.tabs[this.tabKeys['details']].data.forEach(function (node) {
+                    node['totalCommits'] = aux[node.name];
+                });
+            },
+            addPRDataToDetails: function () {
+            }
+        },
         mounted() {
             // Form Page Title
             this.title = `${this.titlePrefix} - ${this.slug}`;
@@ -153,6 +206,7 @@
             this.interval = setInterval(() => {
                 if (this.donePercent >= 100.0) {
                     this.isLoading = false;
+                    this.addCommitDataToDetails();
                     return (this.donePercent = 0.0)
                 }
             }, 1000);
@@ -160,11 +214,11 @@
             // Get GitHub data
             this.resources[this.tabKeys['commits']].get({}).then(response => {
                 this.tabs[this.tabKeys['commits']] = this.fillTabData(
-                    this.prepareCommitsDataForRender(response.body), DataTable, HEADERS1, null);
-            }).catch((error) => {
-                this.fillTabData(
-                    this.prepareCommitsDataForRender(null), DataTable, HEADERS1, null);
-                console.log(error);
+                    this.prepareCommitsDataForRender(response.body), GithubContribution, ['Contribution', 'commits'], null);
+            }).catch((errorCommits) => {
+                this.tabs[this.tabKeys['commits']] = this.fillTabData(
+                    this.prepareCommitsDataForRender(null), GithubContribution, ['Contribution', 'commits'], null);
+                console.log(errorCommits);
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
@@ -193,12 +247,15 @@
                         value: key
                     });
                 });
-                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData(tableData
+
+                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData({
+                        tableData: tableData, baselines: auxData['baselines']
+                    }
                     , GithubCodeQualityByFile, headers, "By Files", leadValue);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorCQ) => {
+                this.tabs[this.tabKeys['codeQualityByFiles']] = this.fillTabData(
                     this.prepareFilesComplexityDataForRender(null), GithubCodeQualityByFile, null, null);
-                console.log(error)
+                console.log(errorCQ)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
@@ -227,27 +284,37 @@
                         value: key
                     });
                 });
-                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData(tableData
+                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData({
+                        tableData: tableData, baselines: auxData['baselines']
+                    }
                     , GithubCodeQualityByAuthor, headers, "By Authors", leadValue);
-            }).catch((error) => {
-                this.fillTabData(
+            }).catch((errorCQA) => {
+                this.tabs[this.tabKeys['codeQualityByAuthors']] = this.fillTabData(
                     this.prepareAuthorsComplexityDataForRender(null), GithubCodeQualityByAuthor, null, null);
-                console.log(error)
+                console.log(errorCQA)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
             this.resources[this.tabKeys['details']].get({}).then(response => {
                 this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(response.body), GitHubDetails,
-                    [{text: 'Member Name', value: 'name'}], "Repository Details", null);
-            }).catch((error) => {
-                this.fillTabData(
+                    ['Member Name', 'Repository Link', 'Total Commits', 'Total PRs'], "Repository Details", null);
+            }).catch((errorDetails) => {
+                this.tabs[this.tabKeys['details']] = this.fillTabData(
                     this.prepareDetailsDataForRender(null), GitHubDetails,
                     [{text: 'Member Name', value: 'name'}], "Repository Details", null);
-                console.log(error)
+                console.log(errorDetails)
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
+            /* These tabs will be filled at runtime */
+            this.tabs[this.tabKeys['commitDetails']] = this.fillTabData(this.preparePlaceholderData(), GitHubCommitDetails, [], "Commit Details",
+                this.slug);
+            this.tabs[this.tabKeys['usCommits']] = this.fillTabData(this.preparePlaceholderData(), GitHubCommitsToTaigaUS, [], "US Commits",
+                this.slug);
+
+            /* Mix the data */
+            /*this.addPRDataToDetails();*/
         },
         beforeDestroy: function () {
             clearInterval(this.interval);

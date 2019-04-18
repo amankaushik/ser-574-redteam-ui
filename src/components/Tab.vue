@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-toolbar color="grey lighten-2" tabs>
-            <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
+            <v-toolbar-title><a :href="repoURL" target="_blank">{{ toolbarTitle }}</a></v-toolbar-title>
             <v-spacer></v-spacer>
             <v-tabs slot="extension" grow v-model="tabModel" color="grey lighten-3">
                 <v-tabs-slider color="brown darken-4"></v-tabs-slider>
@@ -23,7 +23,7 @@
 <script>
     export default {
         name: "Tab",
-        props: {tabTitles: Object, toolbarTitle: String},
+        props: {tabTitles: Object, toolbarTitle: String, repoURL: String},
         data() {
             return {
                 tabModel: null
