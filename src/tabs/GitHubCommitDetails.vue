@@ -135,7 +135,6 @@
                 for (let hashCode in details) {
                     if (details.hasOwnProperty(hashCode)) {
                         if (dataBundleByDate.hasOwnProperty(hashCode)) {
-                            console.log(details[hashCode]);
                             dataBundleByDate[formatDate(details[hashCode].date)]['additions'] +=
                                 details[hashCode]['additions'];
                             dataBundleByDate[formatDate(details[hashCode].date)]['deletions'] +=
@@ -148,7 +147,6 @@
                             dataBundleByDate[formatDate(details[hashCode].date)]['authorCount'] =
                                 dataBundleByDate[formatDate(details[hashCode].date)]['authors'].length;
                         } else {
-                            console.log(details[hashCode]);
                             dataBundleByDate[formatDate(details[hashCode].date)] = {
                                 'additions': {value: details[hashCode]['additions'], text: 'Addition(s)'},
                                 'deletions': {value: details[hashCode]['deletions'], text: 'Deletion(s)'},

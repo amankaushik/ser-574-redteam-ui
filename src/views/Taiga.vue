@@ -23,6 +23,7 @@
     import Tab from "@/components/Tab";
     import TaigaSprintDetails from "@/tabs/TaigaSprintDetails"
     import TaigaTaskDistribution from "@/tabs/TaigaTaskDistribution";
+    import TaigaSprintText from "@/tabs/TaigaSprintText";
 
     export default {
         name: "Taiga",
@@ -50,8 +51,8 @@
             getCommitsAPI: function () {
                 return process.env.VUE_APP_TAIGA_BASE + process.env.VUE_APP_COMMIT_KEY
             },
-            getBurnDownChartAPI: function () {
-                return process.env.VUE_APP_GITHUB_EP + process.env.VUE_APP_CODE_COMPLEXITY_KEY
+            getSprintUSTaskAPI: function () {
+                return process.env.VUE_APP_TAIGA_BASE + process.env.VUE_APP_TAIGA_SPRINT_US_TASKS + this.slug;
             },
             getSprintStoryPointAPI: function () {
                 return process.env.VUE_APP_TAIGA_BASE + process.env.VUE_APP_TAIGA_SPRINT_STORY_POINT + this.slug;
@@ -103,7 +104,11 @@
                 return renderData;
             },
             prepareSprintUSTaskDataForRender: function (data) {
-                return {}
+                if (data == null) {
+                    return [];
+                } else {
+                    return data['sprint_user_task_details'];
+                }
             },
             prepareProcessDataForRender: function () {
                 return {}
@@ -164,7 +169,7 @@
             // Initialize resources
             this.resources[this.tabKeys['sprintDetails']] = this.$resource(this.getSprintDetailsAPI());
             this.resources[this.tabKeys['taskDistribution']] = this.$resource(this.getTaskDistributionAPI());
-            this.resources[this.tabKeys['sprintUSTask']] = this.$resource(this.getTaskDistributionAPI());
+            this.resources[this.tabKeys['sprintUSTask']] = this.$resource(this.getSprintUSTaskAPI());
             this.resources[this.tabKeys['sprintUS']] = this.$resource(this.getSprintUSAPI());
             this.resources[this.tabKeys['sprintStoryPoints']] = this.$resource(this.getSprintStoryPointAPI());
 
@@ -213,10 +218,10 @@
             this.resources[this.tabKeys['sprintUSTask']].get({}).then(response => {
                 this.tabs[this.tabKeys['sprintUSTask']] = this.fillTabData(
                     this.prepareSprintUSTaskDataForRender(response.body),
-                    TaigaTaskDistribution, null, "Sprint, US and Tasks", null);
+                    TaigaSprintText, null, "Sprint, US and Tasks", null);
             }).catch((error) => {
                 this.tabs[this.tabKeys['sprintUSTask']] = this.fillTabData(this.prepareSprintUSTaskDataForRender(null),
-                    TaigaTaskDistribution, null, "Sprint, US and Tasks", null);
+                    TaigaSprintText, null, "Sprint, US and Tasks", null);
                 console.log(error);
             }).finally(() => {
                 this.donePercent += this.addToProgress();

@@ -81,7 +81,6 @@
         watch: {
             courses: {
                 handler() {
-                    console.log(JSON.stringify(this.courses));
                     localStorage.setItem('courses', JSON.stringify(this.courses));
                     },
                 deep: true,
@@ -92,7 +91,6 @@
                 this.activeCourse = index;
             },
             addCourse: function (project) {
-                console.log("add course");
                 this.courses.push({
                     name: project.name,
                     projects:[]
@@ -100,7 +98,6 @@
                 this.showNewCourse=false;
             },
             removeCourse: function (index) {
-                console.log("remove index "+ index);
                 this.courses.splice(index-1, 1);
                 this.showRemoveCourse=false;
             },
@@ -114,7 +111,6 @@
                 this.showNewProject=false;
             },
             removeProject: function (index) {
-                console.log("remove project" + index);
                 this.courses[this.activeCourse].projects.splice(index-1, 1);
                 this.showRemoveProject=false;
             }

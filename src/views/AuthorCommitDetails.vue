@@ -139,7 +139,6 @@
                         }
                     }
                     dates.forEach(function (node, index) {
-                        console.log(node);
                         if (sparklineLOC[author].hasOwnProperty(node)) {
                             sparklineLOC[author][node] += loc[index];
                         } else {

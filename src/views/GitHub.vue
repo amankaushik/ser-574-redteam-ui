@@ -80,7 +80,6 @@
                 if (data === null) {
                     return [];
                 } else {
-                    console.log(data);
                     let collaborators = data["collaborators"];
                     let commits = data["commits"];
                     let gitIdToName = {};
