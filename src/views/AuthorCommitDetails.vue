@@ -19,6 +19,60 @@
                                 <div>{{i}}</div>
                             </template>
                             <v-card>
+                                <v-card
+                                        class="mx-auto text-xs-center"
+                                        color="cyan"
+                                        dark
+                                        max-width="600"
+                                >
+                                    <v-card-text>
+                                        <v-sheet color="rgba(0, 0, 0, .12)">
+                                            <v-sparkline
+                                                    :value="Object.values(sparklineLOC[i])"
+                                                    color="rgba(255, 255, 255, .7)"
+                                                    height="100"
+                                                    padding="24"
+                                                    stroke-linecap="round"
+                                                    smooth
+                                            >
+                                                <template v-slot:label="item">
+                                                    {{ item.value }}
+                                                </template>
+                                            </v-sparkline>
+                                        </v-sheet>
+                                    </v-card-text>
+                                    <v-card-text>
+                                        <div class="display-1 font-weight-thin">Day-to-Day LOC by {{i}}</div>
+                                    </v-card-text>
+                                </v-card>
+                                <v-divider class="my-2"></v-divider>
+                                <v-card
+                                        class="mx-auto text-xs-center"
+                                        color="green"
+                                        dark
+                                        max-width="600"
+                                >
+                                    <v-card-text>
+                                        <v-sheet color="rgba(0, 0, 0, .12)">
+                                            <v-sparkline
+                                                    :value="Object.values(sparklineCommits[i])"
+                                                    color="rgba(255, 255, 255, .7)"
+                                                    height="100"
+                                                    padding="24"
+                                                    stroke-linecap="round"
+                                                    smooth
+                                            >
+                                                <template v-slot:label="item">
+                                                    {{ item.value }}
+                                                </template>
+                                            </v-sparkline>
+                                        </v-sheet>
+                                    </v-card-text>
+                                    <v-card-text>
+                                        <div class="display-1 font-weight-thin">Day-to-Day Commits by {{i}}</div>
+                                    </v-card-text>
+                                </v-card>
+                                <v-divider class="my-2"></v-divider>
                                 <v-card-text>
                                     <v-list>
                                         <template v-for="(node, j) in item">
@@ -55,14 +109,59 @@
         data() {
             return {
                 dataBundleByAuthor: this.$route.params.payload.dataBundleByAuthor,
+                sparklineCommits: {},
+                sparklineLOC: {}
             }
         },
         mounted() {
-            console.log(this.dataBundleByAuthor)
+            let sparklineCommits = {};
+            let sparklineLOC = {};
+            for (let author in this.dataBundleByAuthor) {
+                if (this.dataBundleByAuthor.hasOwnProperty(author)) {
+                    sparklineCommits[author] = {};
+                    sparklineLOC[author] = {};
+                    let dates = [];
+                    let commits = [];
+                    let loc = [];
+                    for (let node in this.dataBundleByAuthor[author]) {
+                        if (this.dataBundleByAuthor[author].hasOwnProperty(node)) {
+                            for (let aux in this.dataBundleByAuthor[author][node]) {
+                                if (this.dataBundleByAuthor[author][node].hasOwnProperty(aux)) {
+                                    let bundle = this.dataBundleByAuthor[author][node][aux];
+                                    if (bundle.text === "Committed On") {
+                                        dates.push(bundle.value);
+                                    } else if (bundle.text === "LOC Added") {
+                                        loc.push(bundle.value);
+                                    }
+                                    commits.push(1);
+                                }
+                            }
+                        }
+                    }
+                    dates.forEach(function (node, index) {
+                        console.log(node);
+                        if (sparklineLOC[author].hasOwnProperty(node)) {
+                            sparklineLOC[author][node] += loc[index];
+                        } else {
+                            sparklineLOC[author][node] = loc[index];
+                        }
+                        if (sparklineCommits[author].hasOwnProperty(node)) {
+                            sparklineCommits[author][node] += commits[index];
+                        } else {
+                            sparklineCommits[author][node] = commits[index];
+                        }
+                    })
+                }
+            }
+
+            this.sparklineLOC = sparklineLOC;
+            this.sparklineCommits = sparklineCommits;
         }
     }
 </script>
 
 <style scoped>
-
+    .v-sheet--offset {
+        position: relative;
+    }
 </style>

@@ -27,6 +27,7 @@
     import GithubCodeQualityByAuthor from "@/tabs/GithubCodeQualityByAuthor";
     import GitHubDetails from "@/tabs/GitHubDetails";
     import GitHubCommitDetails from "@/tabs/GitHubCommitDetails";
+    import GitHubCommitsToTaigaUS from "@/tabs/GitHubCommitsToTaigaUS";
 
     export default {
         name: "Github",
@@ -278,8 +279,10 @@
             }).finally(() => {
                 this.donePercent += this.addToProgress();
             });
-            /* This tab will be filled at runtime */
+            /* These tabs will be filled at runtime */
             this.tabs['Commit Details'] = this.fillTabData({hasData: false}, GitHubCommitDetails, [], "Commit Details",
+                this.slug);
+            this.tabs['US Commits'] = this.fillTabData({hasData: false}, GitHubCommitsToTaigaUS, [], "US Commits",
                 this.slug)
 
             /* Mix the data */

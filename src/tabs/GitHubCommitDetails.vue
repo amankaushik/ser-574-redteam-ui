@@ -1,57 +1,59 @@
 <template>
     <v-container>
-        <template v-if="!data.hasData">
-            <v-container fluid fill-height>
-                <v-layout align-center justify-center>
-                    <v-btn align="center" @click="getCommitDetails()" outline color="green">Get Details</v-btn>
-                    <v-progress-circular v-if="isLoading"
-                                         :rotate="360"
-                                         :size="200"
-                                         :width="150"
-                                         :value="donePercent"
-                                         color="teal"
+        <v-layout justify-center column>
+            <v-card >
+                <template v-if="!data.hasData">
+                    <v-container >
+                        <v-layout align-center justify-center>
+                            <v-btn  @click="getCommitDetails()" outline color="green">Get Details</v-btn>
+                            <v-progress-circular v-if="isLoading"
+                                                 :rotate="360"
+                                                 :size="200"
+                                                 :width="150"
+                                                 :value="donePercent"
+                                                 color="teal"
+                            >
+                                {{ donePercent }}
+                            </v-progress-circular>
+                        </v-layout>
+                    </v-container>
+                </template>
+                <v-timeline align-top v-else>
+                    <v-timeline-item
+                            v-for="(item, i) in dataBundleByDateBadgeDisplay"
+                            :key="i"
+                            :color="item.color"
+                            dark
+                            small
+                            fill-dot
                     >
-                        {{ donePercent }}
-                    </v-progress-circular>
-                </v-layout>
-            </v-container>
-        </template>
-        <v-timeline align-top v-else>
-            <v-timeline-item
-                    v-for="(item, i) in dataBundleByDateBadgeDisplay"
-                    :key="i"
-                    :color="item.color"
-                    dark
-                    small
-                    fill-dot
-            >
-                <v-card
-                        :color="item.color"
-                        dark
-                >
-                    <v-card-title class="title">{{item.data.date}}</v-card-title>
-                    <v-card-text class="white text--primary">
-                        <v-container>
-                            <v-layout>
-                                <v-flex xs12>
-                                    <v-chip :color="item.color" v-for="(node, i) in item.data.data" :key="i" text-color="white">
-                                        <v-avatar class="darken-4" :color="item.color">{{node.value}}</v-avatar>
-                                        {{node.text}}
-                                    </v-chip>
-                                </v-flex>
-                            </v-layout>
-                        </v-container>
-                        <v-btn
-                                :color="item.color"
-                                class="mx-0"
-                                outline
-                                :to="{name:'authorCommitDetails', params: {payload: {dataBundleByAuthor}}, props: true}">
-                            View Details By Author
-                        </v-btn>
-                    </v-card-text>
-                </v-card>
-            </v-timeline-item>
-        </v-timeline>
+                        <v-card :color="item.color">
+                            <v-card-title class="title">{{item.data.date}}</v-card-title>
+                            <v-card-text class="white text--primary">
+                                <v-container>
+                                    <v-layout>
+                                        <v-flex grow>
+                                            <v-chip :color="item.color" v-for="(node, i) in item.data.data" :key="i"
+                                                    text-color="white">
+                                                <v-avatar class="darken-4" :color="item.color">{{node.value}}</v-avatar>
+                                                {{node.text}}
+                                            </v-chip>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                                <v-btn
+                                        :color="item.color"
+                                        class="mx-0"
+                                        outline
+                                        :to="{name:'authorCommitDetails', params: {payload: {dataBundleByAuthor}}, props: true}">
+                                    View Details By Author
+                                </v-btn>
+                            </v-card-text>
+                        </v-card>
+                    </v-timeline-item>
+                </v-timeline>
+            </v-card>
+        </v-layout>
     </v-container>
 </template>
 
